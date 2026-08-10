@@ -1,9 +1,10 @@
-# Gum disease risk screening — prototype
+# Periodontitis risk screening — prototype
 
-A single static page: nine questions in, an estimated risk of severe gum
-disease (periodontitis) out. No backend — the logistic regression model runs
-entirely in the browser (`model.js`), so nothing typed into the form is sent
-or stored anywhere.
+A single static page: nine questions in, an estimated risk of severe
+periodontitis out. No backend — the logistic regression model runs entirely
+in the browser (`model.js`), so nothing typed into the form is sent or
+stored anywhere. Anonymous page-visit counts (not form answers) are tracked
+via [GoatCounter](https://www.goatcounter.com/) — see "Usage stats" below.
 
 **Status: prototype / demo.** This is not a validated clinical tool. The
 model was trained on Dutch cohort data using the validated Dutch wording of
@@ -46,3 +47,12 @@ access to the model bundle.)
 3. The page is served at `https://<user>.github.io/<repo>/`.
 
 No GitHub Actions or build step needed — it's plain HTML/CSS/JS.
+
+## Usage stats
+
+GitHub's own repo Insights → Traffic tab does not track visits to the
+published Pages site, only visits to the repo on github.com. Instead,
+`index.html` loads [GoatCounter](https://www.goatcounter.com/), a free,
+privacy-first analytics script (no cookies, no personal data) that counts
+page visits, referrers, and browsers only — never form answers. View the
+numbers at `https://perio-screening.goatcounter.com`.

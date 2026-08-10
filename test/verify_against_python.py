@@ -8,14 +8,16 @@ Requires the Questionnaire_validation repo's venv (joblib, scikit-learn,
 pandas) and its models/ directory to be reachable at BUNDLE_PATH below.
 """
 import json
+import os
 import subprocess
 import sys
 
 import joblib
 import pandas as pd
 
-BUNDLE_PATH = ("/Users/elena/Library/CloudStorage/OneDrive/"
-               "Questionnaire_validation/models/perio_binary_LR_2026-08-07")
+BUNDLE_PATH = os.environ.get('QV_BUNDLE_PATH') or (
+    "/Users/elena/Library/CloudStorage/OneDrive/Perio_screening/"
+    "Questionnaire_validation/models/perio_binary_LR_2026-08-07")
 
 FEATURES = ['symptom_count', 'Age', 'age_over_39', 'Sex', 'Smoking',
             'Q2_own_teeth_gum_health']

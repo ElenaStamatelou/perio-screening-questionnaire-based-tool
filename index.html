@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gum disease risk screening — prototype</title>
+<meta name="color-scheme" content="light">
+<title>Periodontitis risk screening — prototype</title>
 <style>
   :root {
     --bg: #f7f7f5;
@@ -17,20 +18,6 @@
     --warn-border: #e8c99a;
     --warn-text: #6b4a15;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #17181a;
-      --panel: #212225;
-      --text: #ececea;
-      --muted: #a3a39c;
-      --border: #34353a;
-      --accent: #6fbfa2;
-      --accent-contrast: #10221c;
-      --warn-bg: #3a2f18;
-      --warn-border: #6b5122;
-      --warn-text: #f1cf8f;
-    }
-  }
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -43,6 +30,28 @@
     max-width: 640px;
     margin: 0 auto;
     padding: 1.5rem 1.25rem 4rem;
+  }
+  .lang-toggle {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+  }
+  .lang-btn {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+    font: inherit;
+    cursor: pointer;
+  }
+  .lang-btn[aria-pressed="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-contrast);
+    font-weight: 600;
   }
   h1 {
     font-size: 1.4rem;
@@ -196,166 +205,303 @@
     margin-top: 2rem;
   }
 </style>
+<script data-goatcounter="https://perio-screening.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 <main>
-  <h1>Gum disease risk screening</h1>
-  <p class="subtitle">Nine questions. Nothing you enter is sent anywhere.</p>
+  <div class="lang-toggle">
+    <button type="button" class="lang-btn" data-lang="en">EN</button>
+    <button type="button" class="lang-btn" data-lang="nl">NL</button>
+  </div>
+
+  <h1 data-i18n="h1"></h1>
+  <p class="subtitle" data-i18n="subtitle"></p>
 
   <div class="prototype-banner">
-    <strong>Prototype — not a validated tool.</strong>
-    This page demonstrates a statistical model from an ongoing research project.
-    The questions below are an English adaptation of a questionnaire that was
-    developed and validated in Dutch; the model's accuracy has only been
-    measured using the original Dutch wording, not this translation. Do not
-    use this to make health decisions. See "About this tool" after you get a
-    result.
+    <strong data-i18n="bannerTitle"></strong>
+    <span data-i18n="bannerBody"></span>
   </div>
 
   <form id="quiz" class="panel">
     <fieldset>
-      <legend>About you</legend>
+      <legend data-i18n="legendAboutYou"></legend>
 
       <div class="question">
-        <label class="q-text" for="age">Age (years)</label>
+        <label class="q-text" for="age" data-i18n="ageLabel"></label>
         <input type="number" id="age" name="age" min="18" max="100" required>
       </div>
 
       <div class="question">
-        <span class="q-text">Sex</span>
+        <span class="q-text" data-i18n="sexLabel"></span>
         <div class="options">
           <label class="option">
             <input type="radio" name="sex" value="female" required>
-            <span>Female</span>
+            <span data-i18n="female"></span>
           </label>
           <label class="option">
             <input type="radio" name="sex" value="male">
-            <span>Male</span>
+            <span data-i18n="male"></span>
           </label>
         </div>
       </div>
 
       <div class="question">
-        <span class="q-text">Do you currently smoke?</span>
+        <span class="q-text" data-i18n="smokingQ"></span>
         <div class="options">
           <label class="option">
             <input type="radio" name="smoking" value="no" required>
-            <span>No</span>
+            <span data-i18n="no"></span>
           </label>
           <label class="option">
             <input type="radio" name="smoking" value="yes">
-            <span>Yes</span>
+            <span data-i18n="yes"></span>
           </label>
         </div>
       </div>
     </fieldset>
 
     <fieldset>
-      <legend>Your teeth and gums</legend>
+      <legend data-i18n="legendTeethGums"></legend>
 
       <div class="question">
-        <span class="q-text">1. Has a dental professional ever told you that you have gum disease (periodontitis)?</span>
+        <span class="q-text" data-i18n="q1"></span>
         <div class="options">
-          <label class="option"><input type="radio" name="q1" value="no" required><span>No</span></label>
-          <label class="option"><input type="radio" name="q1" value="yes"><span>Yes</span></label>
+          <label class="option"><input type="radio" name="q1" value="no" required><span data-i18n="no"></span></label>
+          <label class="option"><input type="radio" name="q1" value="yes"><span data-i18n="yes"></span></label>
         </div>
       </div>
 
       <div class="question">
-        <span class="q-text">2. Have you ever been treated for gum disease?</span>
+        <span class="q-text" data-i18n="q3"></span>
         <div class="options">
-          <label class="option"><input type="radio" name="q3" value="no" required><span>No</span></label>
-          <label class="option"><input type="radio" name="q3" value="yes"><span>Yes</span></label>
+          <label class="option"><input type="radio" name="q3" value="no" required><span data-i18n="no"></span></label>
+          <label class="option"><input type="radio" name="q3" value="yes"><span data-i18n="yes"></span></label>
         </div>
       </div>
 
       <div class="question">
-        <span class="q-text">3. Do you have any loose teeth (not caused by an injury)?</span>
+        <span class="q-text" data-i18n="q4"></span>
         <div class="options">
-          <label class="option"><input type="radio" name="q4" value="no" required><span>No</span></label>
-          <label class="option"><input type="radio" name="q4" value="yes"><span>Yes</span></label>
+          <label class="option"><input type="radio" name="q4" value="no" required><span data-i18n="no"></span></label>
+          <label class="option"><input type="radio" name="q4" value="yes"><span data-i18n="yes"></span></label>
         </div>
       </div>
 
       <div class="question">
-        <span class="q-text">4. Has a dental professional ever told you that you have bone loss around your teeth?</span>
+        <span class="q-text" data-i18n="q5"></span>
         <div class="options">
-          <label class="option"><input type="radio" name="q5" value="no" required><span>No</span></label>
-          <label class="option"><input type="radio" name="q5" value="yes"><span>Yes</span></label>
+          <label class="option"><input type="radio" name="q5" value="no" required><span data-i18n="no"></span></label>
+          <label class="option"><input type="radio" name="q5" value="yes"><span data-i18n="yes"></span></label>
         </div>
       </div>
 
       <div class="question">
-        <span class="q-text">5. Have you noticed a change in the appearance of your teeth (for example, they look longer than before)?</span>
+        <span class="q-text" data-i18n="q6"></span>
         <div class="options">
-          <label class="option"><input type="radio" name="q6" value="no" required><span>No</span></label>
-          <label class="option"><input type="radio" name="q6" value="yes"><span>Yes</span></label>
+          <label class="option"><input type="radio" name="q6" value="no" required><span data-i18n="no"></span></label>
+          <label class="option"><input type="radio" name="q6" value="yes"><span data-i18n="yes"></span></label>
         </div>
       </div>
 
       <div class="question">
-        <span class="q-text">6. How would you rate the health of your own teeth and gums?</span>
+        <span class="q-text" data-i18n="q2"></span>
         <div class="options">
-          <label class="option"><input type="radio" name="q2" value="1" required><span>Excellent</span></label>
-          <label class="option"><input type="radio" name="q2" value="2"><span>Very good</span></label>
-          <label class="option"><input type="radio" name="q2" value="3"><span>Good</span></label>
-          <label class="option"><input type="radio" name="q2" value="4"><span>Fair</span></label>
-          <label class="option"><input type="radio" name="q2" value="5"><span>Poor</span></label>
+          <label class="option"><input type="radio" name="q2" value="1" required><span data-i18n="q2Excellent"></span></label>
+          <label class="option"><input type="radio" name="q2" value="2"><span data-i18n="q2VeryGood"></span></label>
+          <label class="option"><input type="radio" name="q2" value="3"><span data-i18n="q2Good"></span></label>
+          <label class="option"><input type="radio" name="q2" value="4"><span data-i18n="q2Fair"></span></label>
+          <label class="option"><input type="radio" name="q2" value="5"><span data-i18n="q2Poor"></span></label>
         </div>
       </div>
     </fieldset>
 
-    <button type="submit" id="submit-btn" disabled>Get my estimate</button>
+    <button type="submit" id="submit-btn" disabled data-i18n="submitBtn"></button>
   </form>
 
   <section id="result-screen" class="panel hidden">
-    <p class="result-label">Estimated likelihood of severe gum disease</p>
+    <p class="result-label" data-i18n="resultLabel"></p>
     <p class="result-number" id="result-number">—</p>
 
-    <div class="always-caveat">
-      This is a screening estimate, not a diagnosis. Gum disease is diagnosed
-      by a dental examination. If you have any of the symptoms above, see a
-      dentist regardless of this result.
-    </div>
+    <div class="always-caveat" data-i18n="alwaysCaveat"></div>
 
     <details>
-      <summary>About this tool</summary>
-      <p>
-        This estimate comes from a logistic regression model built from a
-        research project validating short questionnaires as a periodontitis
-        screening aid. In internal cross-validation on 469 patients from
-        three Dutch cohorts, the model reached an AUC of 0.785 (a measure of
-        how well it ranks people by risk) with calibration close to observed
-        rates (O:E 0.99). That is an estimate of performance on the data it
-        was built from, not a guarantee for you individually.
-      </p>
+      <summary data-i18n="aboutSummary"></summary>
+      <p data-i18n="aboutP1"></p>
       <ul>
-        <li>The six questions above are an English adaptation of a
-          questionnaire validated in Dutch (Verhulst et al., 2019). The
-          model's measured accuracy applies to the original Dutch wording —
-          this translation has not been separately validated.</li>
-        <li>The development sample was not a general population: it came
-          from hospital and periodontal-care cohorts, so the mix of people
-          who did and didn't have severe gum disease is not necessarily the
-          same as in the general population.</li>
-        <li>Nothing you type here is transmitted, logged, or stored. The
-          calculation runs entirely in your browser; there is no server
-          behind this page.</li>
-        <li>This is a research prototype, not a certified medical device
-          or clinical decision tool.</li>
+        <li data-i18n="aboutLi1"></li>
+        <li data-i18n="aboutLi2"></li>
+        <li data-i18n="aboutLi3"></li>
+        <li data-i18n="aboutLi4"></li>
+        <li data-i18n="aboutLi5"></li>
       </ul>
     </details>
 
-    <button type="button" id="restart-btn">Start over</button>
+    <button type="button" id="restart-btn" data-i18n="restartBtn"></button>
   </section>
 
   <footer>
-    Research prototype · <a href="https://github.com/astranovasky/perio-screening-tool">source</a>
+    <span data-i18n="footerText"></span> · <a href="https://github.com/astranovasky/perio-screening-tool" data-i18n="footerSource"></a>
   </footer>
 </main>
 
 <script src="model.js"></script>
 <script>
+  const I18N = {
+    en: {
+      docTitle: 'Periodontitis risk screening — prototype',
+      h1: 'Periodontitis risk screening',
+      subtitle: 'Nine questions. Nothing you enter is sent anywhere.',
+      bannerTitle: 'Prototype — not a validated tool.',
+      bannerBody: 'This page demonstrates a statistical model from an ongoing ' +
+        'research project. The questions below are an English adaptation of a ' +
+        'questionnaire that was developed and validated in Dutch; the model’s ' +
+        'accuracy has only been measured using the original Dutch wording, not ' +
+        'this translation. Do not use this to make health decisions. See ' +
+        '“About this tool” after you get a result.',
+      legendAboutYou: 'About you',
+      ageLabel: 'Age (years)',
+      sexLabel: 'Sex',
+      female: 'Female',
+      male: 'Male',
+      smokingQ: 'Do you currently smoke?',
+      no: 'No',
+      yes: 'Yes',
+      legendTeethGums: 'Your teeth and gums',
+      q1: '1. Has a dental professional ever told you that you have periodontitis?',
+      q3: '2. Have you ever been treated for periodontitis?',
+      q4: '3. Do you have any loose teeth (not caused by an injury)?',
+      q5: '4. Has a dental professional ever told you that you have bone loss around your teeth?',
+      q6: '5. Have you noticed a change in the appearance of your teeth (for example, they look longer than before)?',
+      q2: '6. How would you rate the health of your own teeth and gums?',
+      q2Excellent: 'Excellent',
+      q2VeryGood: 'Very good',
+      q2Good: 'Good',
+      q2Fair: 'Fair',
+      q2Poor: 'Poor',
+      submitBtn: 'Get my estimate',
+      resultLabel: 'Estimated likelihood of severe periodontitis',
+      alwaysCaveat: 'This is a screening estimate, not a diagnosis. Periodontitis ' +
+        'is diagnosed by a dental examination. If you have any of the symptoms ' +
+        'above, see a dentist regardless of this result.',
+      aboutSummary: 'About this tool',
+      aboutP1: 'This estimate comes from a logistic regression model built from ' +
+        'a research project validating short questionnaires as a periodontitis ' +
+        'screening aid. In internal cross-validation on 469 patients from three ' +
+        'Dutch cohorts, the model reached an AUC of 0.785 (a measure of how ' +
+        'well it ranks people by risk) with calibration close to observed rates ' +
+        '(O:E 0.99). That is an estimate of performance on the data it was ' +
+        'built from, not a guarantee for you individually.',
+      aboutLi1: 'The six questions above are an English adaptation of a ' +
+        'questionnaire validated in Dutch (Verhulst et al., 2019). The model’s ' +
+        'measured accuracy applies to the original Dutch wording — this ' +
+        'translation has not been separately validated.',
+      aboutLi2: 'The development sample was not a general population: it came ' +
+        'from hospital and periodontal-care cohorts, so the mix of people who ' +
+        'did and didn’t have severe periodontitis is not necessarily the same ' +
+        'as in the general population.',
+      aboutLi3: 'Nothing you type into the form — your age, answers, or ' +
+        'result — is transmitted, logged, or stored anywhere. The ' +
+        'calculation runs entirely in your browser.',
+      aboutLi4: 'This page uses GoatCounter, a privacy-friendly analytics ' +
+        'service, to count anonymous page visits (no cookies, no personal ' +
+        'data, no form answers). This is only used to see how often the tool ' +
+        'is used, never what anyone answered.',
+      aboutLi5: 'This is a research prototype, not a certified medical device ' +
+        'or clinical decision tool.',
+      restartBtn: 'Start over',
+      footerText: 'Research prototype',
+      footerSource: 'source',
+    },
+    nl: {
+      docTitle: 'Parodontitis-risicoscreening — prototype',
+      h1: 'Parodontitis-risicoscreening',
+      subtitle: 'Negen vragen. Er wordt niets van uw invoer verzonden.',
+      bannerTitle: 'Prototype — geen gevalideerde tool.',
+      bannerBody: 'Deze pagina demonstreert een statistisch model uit een lopend ' +
+        'onderzoeksproject. De onderstaande vragen zijn de gepubliceerde ' +
+        'Nederlandse vertaling uit het oorspronkelijke onderzoek (Verhulst et ' +
+        'al., 2019, aanvullend materiaal). Gebruik dit niet om ' +
+        'gezondheidsbeslissingen op te baseren. Zie “Over deze tool” na het ' +
+        'invullen.',
+      legendAboutYou: 'Over u',
+      ageLabel: 'Leeftijd (jaren)',
+      sexLabel: 'Geslacht',
+      female: 'Vrouw',
+      male: 'Man',
+      smokingQ: 'Rookt u op dit moment?',
+      no: 'Nee',
+      yes: 'Ja',
+      legendTeethGums: 'Uw tanden en tandvlees',
+      q1: '1. Denkt u dat u een tandvleesaandoening heeft, ook wel gingivitis of parodontitis genoemd?',
+      q3: '2. Bent u wel eens voor een tandvleesaandoening behandeld, soms ook wel “diep schoonmaken” of “pocket behandeling” genoemd?',
+      q4: '3. Heeft u wel eens last van losstaande tanden gehad, zonder dat daar een ongeluk of trauma aan vooraf ging?',
+      q5: '4. Heeft een tandheelkundige specialist u wel eens verteld dat u botverlies heeft rondom uw tanden?',
+      q6: '5. Heeft u de afgelopen drie maanden wel eens gemerkt dat een tand er niet goed uit zag?',
+      q2: '6. Hoe zou u over het algemeen genomen de gezondheid van uw tanden en tandvlees beoordelen?',
+      q2Excellent: 'Uitstekend',
+      q2VeryGood: 'Zeer goed',
+      q2Good: 'Goed',
+      q2Fair: 'Matig',
+      q2Poor: 'Slecht',
+      submitBtn: 'Bereken mijn schatting',
+      resultLabel: 'Geschatte kans op ernstige parodontitis',
+      alwaysCaveat: 'Dit is een screeningsschatting, geen diagnose. Parodontitis ' +
+        'wordt vastgesteld door een tandheelkundig onderzoek. Heeft u een van ' +
+        'de klachten hierboven, ga dan sowieso naar de tandarts, ongeacht deze ' +
+        'uitslag.',
+      aboutSummary: 'Over deze tool',
+      aboutP1: 'Deze schatting komt van een logistisch-regressiemodel, ' +
+        'ontwikkeld in een onderzoeksproject dat korte vragenlijsten valideert ' +
+        'als hulpmiddel bij het screenen op parodontitis. In interne ' +
+        'kruisvalidatie op 469 patiënten uit drie Nederlandse cohorten ' +
+        'behaalde het model een AUC van 0,785 (een maat voor hoe goed het ' +
+        'mensen naar risico rangschikt), met een kalibratie die dicht bij de ' +
+        'waargenomen percentages ligt (O:E 0,99). Dit is een schatting van de ' +
+        'prestaties op de gegevens waarop het model is gebouwd, geen garantie ' +
+        'voor u persoonlijk.',
+      aboutLi1: 'De zes vragen hierboven zijn de gepubliceerde Nederlandse ' +
+        'vertaling uit het oorspronkelijke onderzoek (Verhulst et al., 2019, ' +
+        'aanvullend materiaal) — dichter bij de vraagtekst waarop het model ' +
+        'is gevalideerd dan de Engelse bewerking op deze pagina, maar dit ' +
+        'webformulier zelf is niet opnieuw en apart gevalideerd.',
+      aboutLi2: 'De ontwikkelingssteekproef is geen algemene populatie: de ' +
+        'patiënten kwamen uit ziekenhuis- en parodontologiepraktijken, dus ' +
+        'de verhouding mensen met en zonder ernstige parodontitis is niet per ' +
+        'se hetzelfde als in de algemene bevolking.',
+      aboutLi3: 'Niets van wat u in het formulier invult — uw leeftijd, ' +
+        'antwoorden of uitslag — wordt verzonden, gelogd of ergens ' +
+        'opgeslagen. De berekening gebeurt volledig in uw browser.',
+      aboutLi4: 'Deze pagina gebruikt GoatCounter, een privacyvriendelijke ' +
+        'analysedienst, om anonieme paginabezoeken te tellen (geen cookies, ' +
+        'geen persoonsgegevens, geen antwoorden uit het formulier). Dit wordt ' +
+        'alleen gebruikt om te zien hoe vaak de tool wordt gebruikt, nooit wat ' +
+        'iemand heeft geantwoord.',
+      aboutLi5: 'Dit is een onderzoeksprototype, geen gecertificeerd medisch ' +
+        'hulpmiddel of klinisch beslissingsinstrument.',
+      restartBtn: 'Opnieuw beginnen',
+      footerText: 'Onderzoeksprototype',
+      footerSource: 'broncode',
+    },
+  };
+
+  function applyLanguage(lang) {
+    document.documentElement.lang = lang;
+    document.title = I18N[lang].docTitle;
+    document.querySelectorAll('[data-i18n]').forEach((el) => {
+      const key = el.getAttribute('data-i18n');
+      if (I18N[lang][key] != null) el.textContent = I18N[lang][key];
+    });
+    document.querySelectorAll('.lang-btn').forEach((btn) => {
+      btn.setAttribute('aria-pressed', btn.dataset.lang === lang ? 'true' : 'false');
+    });
+  }
+
+  document.querySelectorAll('.lang-btn').forEach((btn) => {
+    btn.addEventListener('click', () => applyLanguage(btn.dataset.lang));
+  });
+  applyLanguage('en');
+
   const form = document.getElementById('quiz');
   const submitBtn = document.getElementById('submit-btn');
   const resultScreen = document.getElementById('result-screen');
