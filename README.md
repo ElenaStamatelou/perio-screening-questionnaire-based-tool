@@ -26,12 +26,14 @@ then visit `http://localhost:8000`.
 
 ## Correctness check
 
-`model.js` is exported from the sklearn model bundle
-(`models/perio_binary_LR_2026-08-07/`) in the source research repo, at full
-floating-point precision. `test/verify_against_python.py` re-loads that
-bundle with joblib and checks that `model.js`'s predictions agree with
-`model.predict_proba()` to within 1e-9, for five fixed test patients. Run it
-whenever `model.js` is regenerated:
+`model.js` is exported (via the research repo's `src/export_model_js.py`) from
+the newest `perio_binary_LR_*` bundle in the source research repo's `models/`,
+at full floating-point precision. `test/verify_against_python.py` finds that
+same latest bundle itself — it no longer hardcodes a bundle date, which is what
+let it go stale against this file once already — loads it with joblib, and
+checks that `model.js`'s predictions agree with `model.predict_proba()` to
+within 1e-9, for six fixed test patients. Run it whenever `model.js` is
+regenerated:
 
 ```
 python3 test/verify_against_python.py

@@ -7,6 +7,7 @@ Run from perio-screening-tool/:
 Requires the Questionnaire_validation repo's venv (joblib, scikit-learn,
 pandas) and its models/ directory to be reachable at BUNDLE_PATH below.
 """
+import glob
 import json
 import os
 import subprocess
@@ -15,12 +16,37 @@ import sys
 import joblib
 import pandas as pd
 
-BUNDLE_PATH = os.environ.get('QV_BUNDLE_PATH') or (
+_RESEARCH_MODELS_DIR = (
     "/Users/elena/Library/CloudStorage/OneDrive/Perio_screening/"
-    "Questionnaire_validation/models/perio_binary_LR_2026-08-07")
+    "Questionnaire_validation/models")
 
-FEATURES = ['symptom_count', 'Age', 'age_over_39', 'Sex', 'Smoking',
-            'Q2_own_teeth_gum_health']
+
+def _latest_lr_bundle(models_dir=_RESEARCH_MODELS_DIR):
+    """
+    Newest perio_binary_LR_* bundle directory, or None.
+
+    A hardcoded date here goes stale the moment a fresh bundle is trained —
+    which is exactly what happened to this file once already (it named
+    perio_binary_LR_2026-08-07 long after that bundle stopped being current).
+    Sorting by name works because the date is embedded YYYY-MM-DD and an
+    optional cohort suffix sorts after it, so lexicographic order is
+    chronological order here.
+    """
+    candidates = sorted(glob.glob(os.path.join(models_dir, 'perio_binary_LR_*')))
+    return candidates[-1] if candidates else None
+
+
+BUNDLE_PATH = os.environ.get('QV_BUNDLE_PATH') or _latest_lr_bundle()
+
+# The 'compact' engineered arm: symptom_count replaces the five yes/no symptom
+# items, age is linear (no age_over_39 / age_spline term — both were tried and
+# neither beat the linear term in nested CV; see benchmark.py's FEATURE_SETS).
+# If the shipped arm changes again, this list and to_model_row() below are the
+# two places that have to follow it — there is no bundle-driven auto-detection
+# here on purpose, so that a silent arm change cannot make this test silently
+# pass by comparing the wrong columns; it will instead fail loudly against
+# whatever bundle BUNDLE_PATH resolves to, which is the point of the test.
+FEATURES = ['symptom_count', 'Age', 'Sex', 'Smoking', 'Q2_own_teeth_gum_health']
 
 # Fixed test patients, in the JS-facing answer shape.
 PATIENTS = [
@@ -40,10 +66,14 @@ PATIENTS = [
          Q1_gum_disease=False, Q3_gum_treatment=True, Q4_loose_teeth=False,
          Q5_bone_loss=False, Q6_tooth_appearance=True,
          Q2_own_teeth_gum_health=2),
-    dict(Age=55, Sex='male', Smoking=False,
+    dict(Age=18, Sex='male', Smoking=False,
          Q1_gum_disease=False, Q3_gum_treatment=False, Q4_loose_teeth=True,
          Q5_bone_loss=False, Q6_tooth_appearance=False,
          Q2_own_teeth_gum_health=4),
+    dict(Age=90, Sex='female', Smoking=True,
+         Q1_gum_disease=True, Q3_gum_treatment=True, Q4_loose_teeth=False,
+         Q5_bone_loss=True, Q6_tooth_appearance=True,
+         Q2_own_teeth_gum_health=5),
 ]
 
 SYMPTOM_KEYS = ['Q1_gum_disease', 'Q3_gum_treatment', 'Q4_loose_teeth',
@@ -55,7 +85,6 @@ def to_model_row(patient):
     return {
         'symptom_count': symptom_count,
         'Age': patient['Age'],
-        'age_over_39': 1.0 if patient['Age'] > 39 else 0.0,
         'Sex': 1.0 if patient['Sex'] == 'male' else 0.0,
         'Smoking': 1.0 if patient['Smoking'] else 0.0,
         'Q2_own_teeth_gum_health': patient['Q2_own_teeth_gum_health'],
@@ -86,6 +115,12 @@ def js_predictions():
 
 
 def main():
+    if not BUNDLE_PATH:
+        raise SystemExit(
+            f"no perio_binary_LR_* bundle found under {_RESEARCH_MODELS_DIR}. "
+            f"Run src/run_binary_experiments.py in the research repo first, or "
+            f"set QV_BUNDLE_PATH explicitly.")
+    print(f"Bundle: {BUNDLE_PATH}")
     py = python_predictions()
     js = js_predictions()
     print(f"{'patient':>8}  {'python':>12}  {'js':>12}  {'abs diff':>12}")
