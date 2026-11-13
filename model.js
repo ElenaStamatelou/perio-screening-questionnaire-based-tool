@@ -37,6 +37,15 @@ const MODEL = {
     Smoking: 0.15542521994134897,
     Q2_own_teeth_gum_health: 0.5439882697947214,
   },
+  // Share answering yes to each symptom question in the training cohort: the explanation
+  // is given per question (they add up to the symptom count's value).
+  symptomItemMeans: {
+    Q1_gum_disease: 0.20527859237536658,
+    Q3_gum_treatment: 0.2375366568914956,
+    Q4_loose_teeth: 0.16422287390029325,
+    Q5_bone_loss: 0.1906158357771261,
+    Q6_tooth_appearance: 0.15542521994134897,
+  },
 };
 
 // The five yes/no symptom questions summed into `symptom_count`.
@@ -82,11 +91,21 @@ function predictSevereRisk(answers) {
  * training patient. For this logistic regression they are exact (coefficient x (scaled value - training
  * mean)); positive raises the predicted probability, negative lowers it. They add up to
  * logit(prediction) - logit(average patient). Returns { values: {feature: shap}, inputs: raw inputs }.
+ * The symptom count is reported per question (MODEL.symptomItemMeans): the count is a sum, so each question
+ * has the coefficient of the count divided by its range, and the five values add up to the count's value.
  */
 function explainSevereRisk(answers) {
   const raw = modelInputs(answers);
   const values = {};
   for (const key in MODEL.coefficients) {
+    if (key === 'symptom_count' && MODEL.symptomItemMeans) {
+      const { min, max } = MODEL.scaler[key];
+      const perItem = MODEL.coefficients[key] / (max - min);
+      for (const item in MODEL.symptomItemMeans) {
+        values[item] = perItem * ((answers[item] ? 1 : 0) - MODEL.symptomItemMeans[item]);
+      }
+      continue;
+    }
     values[key] = MODEL.coefficients[key] * (scaledInput(raw, key) - MODEL.trainingMeans[key]);
   }
   return { values, inputs: raw };

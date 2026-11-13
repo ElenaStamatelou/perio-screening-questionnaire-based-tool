@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>Periodontitis risk screening — prototype</title>
+<title>Periodontitis screening — prototype</title>
 <meta name="description" content="A two-minute questionnaire that estimates the risk of severe periodontitis, for use by healthcare professionals. Runs in the browser; nothing is stored.">
 <meta name="author" content="Elena Stamatelou">
 <link rel="icon" type="image/svg+xml" href="logo.svg">
 <link rel="apple-touch-icon" href="social-card.png">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Periodontitis risk screening">
+<meta property="og:title" content="Periodontitis screening">
 <meta property="og:description" content="A two-minute questionnaire that estimates the risk of severe periodontitis, for healthcare professionals.">
 <meta property="og:image" content="https://elenastamatelou.github.io/perio-screening-questionnaire-based-tool/social-card.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -161,6 +161,7 @@
     cursor: not-allowed;
   }
   .hidden { display: none; }
+  .field-msg { color: var(--warn-text); font-size: 0.85rem; margin: 0.35rem 0 0; }
   .result-number {
     font-size: 2.6rem;
     font-weight: 700;
@@ -273,7 +274,8 @@
 
       <div class="question">
         <label class="q-text" for="age" data-i18n="ageLabel"></label>
-        <input type="number" id="age" name="age" min="18" max="100" required>
+        <input type="number" id="age" name="age" min="18" max="100" step="1" inputmode="numeric" required>
+        <p class="field-msg hidden" id="age-msg" data-i18n="ageInvalid"></p>
       </div>
 
       <div class="question">
@@ -407,10 +409,11 @@
 <script>
   const I18N = {
     en: {
-      docTitle: 'Periodontitis risk screening — prototype',
-      h1: 'Periodontitis risk screening',
+      docTitle: 'Periodontitis screening — prototype',
+      h1: 'Periodontitis screening',
       subtitle: 'For the healthcare professional: read each question to the patient, ' +
-        'as written, and tick the answer the patient gives.',
+        'as written, and enter the age or tick the answer the patient gives.',
+      ageInvalid: 'Enter the age in whole years, between 18 and 100.',
       legendAboutYou: 'About the patient',
       ageLabel: 'Age (years)',
       sexLabel: 'Sex',
@@ -488,11 +491,10 @@
       whyTitle: 'Why this result?',
       whyIntro: 'Compared with the average patient of the study the model was built on, ' +
         'these answers raised (▲) or lowered (▼) the estimate:',
-      whySymptoms: (k, names) => `Gum questions 1–5: ${k} of 5 answered yes` +
-        (names.length ? ` (${names.join(', ')})` : ''),
-      symptomNames: { Q1_gum_disease: 'gum disease', Q3_gum_treatment: 'gum treatment',
-        Q4_loose_teeth: 'loose teeth', Q5_bone_loss: 'bone loss',
-        Q6_tooth_appearance: 'tooth that doesn’t look right' },
+      whyItem: (name, yes) => `${name}: ${yes ? 'yes' : 'no'}`,
+      itemNames: { Q1_gum_disease: 'Self-perceived gum disease', Q3_gum_treatment: 'Previous gum treatment',
+        Q4_loose_teeth: 'Loose teeth', Q5_bone_loss: 'Bone loss around the teeth',
+        Q6_tooth_appearance: 'Tooth that doesn’t look right' },
       whyAge: (a) => `Age ${a}`,
       whySmokes: 'Smokes',
       whyNoSmoke: 'Does not smoke',
@@ -509,10 +511,11 @@
         'still have periodontitis.',
     },
     nl: {
-      docTitle: 'Parodontitis-risicoscreening — prototype',
-      h1: 'Parodontitis-risicoscreening',
-      subtitle: 'Voor de zorgverlener: lees elke vraag letterlijk voor ' +
-        'aan de patiënt en vink het antwoord van de patiënt aan.',
+      docTitle: 'Parodontitis-screening — prototype',
+      h1: 'Parodontitis-screening',
+      subtitle: 'Voor de zorgverlener: lees elke vraag letterlijk voor aan de patiënt ' +
+        'en vul de leeftijd in of vink het antwoord van de patiënt aan.',
+      ageInvalid: 'Vul de leeftijd in hele jaren in, tussen 18 en 100.',
       legendAboutYou: 'Over de patiënt',
       ageLabel: 'Leeftijd (jaren)',
       sexLabel: 'Geslacht',
@@ -590,11 +593,10 @@
       whyTitle: 'Waarom deze uitslag?',
       whyIntro: 'Vergeleken met de gemiddelde patiënt uit het onderzoek waarop het model ' +
         'is gebouwd, verhoogden (▲) of verlaagden (▼) deze antwoorden de schatting:',
-      whySymptoms: (k, names) => `Tandvleesvragen 1–5: ${k} van de 5 met ja beantwoord` +
-        (names.length ? ` (${names.join(', ')})` : ''),
-      symptomNames: { Q1_gum_disease: 'tandvleesaandoening', Q3_gum_treatment: 'tandvleesbehandeling',
-        Q4_loose_teeth: 'losstaande tanden', Q5_bone_loss: 'botverlies',
-        Q6_tooth_appearance: 'tand die er niet goed uitziet' },
+      whyItem: (name, yes) => `${name}: ${yes ? 'ja' : 'nee'}`,
+      itemNames: { Q1_gum_disease: 'Zelf ervaren tandvleesaandoening', Q3_gum_treatment: 'Eerdere tandvleesbehandeling',
+        Q4_loose_teeth: 'Losstaande tanden', Q5_bone_loss: 'Botverlies rondom de tanden',
+        Q6_tooth_appearance: 'Tand die er niet goed uitziet' },
       whyAge: (a) => `Leeftijd ${a}`,
       whySmokes: 'Rookt',
       whyNoSmoke: 'Rookt niet',
@@ -650,9 +652,9 @@
     const { values, inputs } = explainSevereRisk(answers);
     const scale = Math.max(1, ...Object.values(values).map(Math.abs));
     const q2Words = [null, t.q2Excellent, t.q2VeryGood, t.q2Good, t.q2Fair, t.q2Poor];
+    // One row per symptom question (Elena, 13 Nov 2026), with the patient's answer
     const label = {
-      symptom_count: t.whySymptoms(inputs.symptom_count,
-        SYMPTOM_KEYS.filter((k) => answers[k]).map((k) => t.symptomNames[k])),
+      ...Object.fromEntries(SYMPTOM_KEYS.map((k) => [k, t.whyItem(t.itemNames[k], answers[k])])),
       Age: t.whyAge(answers.Age),
       Smoking: answers.Smoking ? t.whySmokes : t.whyNoSmoke,
       Q2_own_teeth_gum_health: t.whyQ2(q2Words[answers.Q2_own_teeth_gum_health].toLowerCase()),
@@ -720,6 +722,18 @@
   const submitBtn = document.getElementById('submit-btn');
   const resultScreen = document.getElementById('result-screen');
   const resultNumber = document.getElementById('result-number');
+  const subtitle = document.querySelector('.subtitle');
+
+  // Age must be a whole number of years in the range the input allows (18-100); anything else keeps the
+  // button disabled and shows a message under the field.
+  const ageInput = document.getElementById('age');
+  const ageMsg = document.getElementById('age-msg');
+  function ageValid() {
+    const raw = ageInput.value.trim();
+    if (!/^\d+$/.test(raw)) return false;
+    const a = Number(raw);
+    return a >= Number(ageInput.min) && a <= Number(ageInput.max);
+  }
 
   function allAnswered() {
     const required = form.querySelectorAll('[required]');
@@ -730,15 +744,19 @@
         return false;
       }
     }
-    return true;
+    return ageValid();
   }
 
   form.addEventListener('input', () => {
+    // badInput: the browser holds text that is not a number (the value then reads as empty)
+    const typed = ageInput.value !== '' || ageInput.validity.badInput;
+    ageMsg.classList.toggle('hidden', !typed || ageValid());
     submitBtn.disabled = !allAnswered();
   });
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
+    if (!allAnswered()) return;            // never score an incomplete or invalid form
     const data = new FormData(form);
 
     const answers = {
@@ -760,6 +778,7 @@
     showWhy(answers);
 
     form.classList.add('hidden');
+    subtitle.classList.add('hidden');      // the instruction is for the questions, not for the result
     resultScreen.classList.remove('hidden');
     resultScreen.scrollIntoView({ behavior: 'smooth' });
   });
@@ -772,6 +791,8 @@
     document.getElementById('prob-details').open = false;
     submitBtn.disabled = true;
     resultScreen.classList.add('hidden');
+    ageMsg.classList.add('hidden');
+    subtitle.classList.remove('hidden');
     form.classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
