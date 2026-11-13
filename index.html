@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Periodontitis risk screening — prototype</title>
+<meta name="description" content="A two-minute questionnaire that estimates the risk of severe periodontitis, for use by healthcare professionals. Runs in the browser; nothing is stored.">
+<meta name="author" content="Elena Stamatelou">
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="apple-touch-icon" href="social-card.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Periodontitis risk screening">
+<meta property="og:description" content="A two-minute questionnaire that estimates the risk of severe periodontitis, for healthcare professionals.">
+<meta property="og:image" content="https://elenastamatelou.github.io/perio-screening-questionnaire-based-tool/social-card.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
   :root {
     --bg: #f7f7f5;
@@ -56,22 +65,16 @@
   h1 {
     font-size: 1.4rem;
     margin: 1rem 0 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
   }
+  h1 img { width: 40px; height: 40px; flex: none; }
   .subtitle {
     color: var(--muted);
     margin: 0 0 1.25rem;
     font-size: 0.95rem;
   }
-  .prototype-banner {
-    background: var(--warn-bg);
-    border: 1px solid var(--warn-border);
-    color: var(--warn-text);
-    border-radius: 10px;
-    padding: 0.85rem 1rem;
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
-  }
-  .prototype-banner strong { display: block; margin-bottom: 0.25rem; }
   .panel {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -168,6 +171,52 @@
     margin: 0 0 1rem;
     font-size: 0.95rem;
   }
+  .result-words {
+    color: var(--muted);
+    margin: 0 0 1rem;
+  }
+  .advice {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+  }
+  .result-number.is-high { color: var(--warn-text); }
+  .result-number.is-low { color: var(--accent); }
+  .advice.high { border-color: var(--warn-border); background: var(--warn-bg); color: var(--warn-text); }
+  .advice p { margin: 0.25rem 0; }
+  /* "Why this result": one row per model input, a bar from the centre line (right = raises, left =
+     lowers the estimate) and the effect in words; SHAP values of the model (explainSevereRisk). */
+  .why { margin-top: 1rem; }
+  .why h2 { font-size: 1rem; margin: 0 0 0.25rem; }
+  .why-intro { font-size: 0.9rem; color: var(--muted); margin: 0 0 0.6rem; }
+  .why-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 140px 7.5rem;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.35rem 0;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+  .why-row:first-of-type { border-top: none; }
+  .why-bar { position: relative; height: 12px; }
+  .why-bar::before {                       /* centre line = the average patient */
+    content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px;
+    border-left: 1px solid var(--muted);
+  }
+  .why-bar span { position: absolute; top: 0; height: 100%; border-radius: 2px; }
+  .why-bar span.up { left: 50%; background: #c98a3a; }
+  .why-bar span.down { right: 50%; background: var(--accent); }
+  .why-effect { font-size: 0.85rem; }
+  .why-effect.up { color: var(--warn-text); }
+  .why-effect.down { color: var(--accent); }
+  .why-effect.none { color: var(--muted); }
+  .why details { margin-top: 0.6rem; }
+  @media (max-width: 480px) {
+    .why-row { grid-template-columns: minmax(0, 1fr) 64px 6.2rem; gap: 0.4rem; font-size: 0.85rem; }
+    .why-effect { font-size: 0.8rem; }
+  }
   .always-caveat {
     border-left: 3px solid var(--accent);
     padding: 0.15rem 0 0.15rem 0.85rem;
@@ -215,12 +264,8 @@
     <button type="button" class="lang-btn" data-lang="nl">NL</button>
   </div>
 
-  <h1 data-i18n="h1"></h1>
-
-  <div class="prototype-banner">
-    <strong data-i18n="bannerTitle"></strong>
-    <span data-i18n="bannerBody"></span>
-  </div>
+  <h1><img src="logo.svg" alt=""><span data-i18n="h1"></span></h1>
+  <p class="subtitle" data-i18n="subtitle"></p>
 
   <form id="quiz" class="panel">
     <fieldset>
@@ -321,6 +366,20 @@
   <section id="result-screen" class="panel hidden">
     <p class="result-label" data-i18n="resultLabel"></p>
     <p class="result-number" id="result-number">—</p>
+    <div class="advice" id="advice"></div>
+    <div class="why hidden" id="why">
+      <h2 data-i18n="whyTitle"></h2>
+      <p class="why-intro" data-i18n="whyIntro"></p>
+      <div id="why-rows"></div>
+      <details>
+        <summary data-i18n="whyHowSummary"></summary>
+        <p data-i18n="whyHow"></p>
+      </details>
+    </div>
+    <details id="prob-details">
+      <summary data-i18n="probSummary"></summary>
+      <p><b id="result-pct">—</b>: <span id="result-words"></span>. <span id="thr-note"></span></p>
+    </details>
 
     <div class="always-caveat" data-i18n="alwaysCaveat"></div>
 
@@ -350,14 +409,9 @@
     en: {
       docTitle: 'Periodontitis risk screening — prototype',
       h1: 'Periodontitis risk screening',
-      bannerTitle: 'Prototype — not a validated tool.',
-      bannerBody: 'This page demonstrates a statistical model from an ongoing ' +
-        'research project. The questions below are the original English ' +
-        'self-reported oral health items; the model was built from answers ' +
-        'given to their validated Dutch translation, so its accuracy has only ' +
-        'been measured on Dutch responses. Do not use this to make health ' +
-        'decisions. See “About this tool” after you get a result.',
-      legendAboutYou: 'About you',
+      subtitle: 'For the healthcare professional: read each question to the patient, ' +
+        'as written, and tick the answer the patient gives.',
+      legendAboutYou: 'About the patient',
       ageLabel: 'Age (years)',
       sexLabel: 'Sex',
       female: 'Female',
@@ -365,7 +419,7 @@
       smokingQ: 'Do you currently smoke?',
       no: 'No',
       yes: 'Yes',
-      legendTeethGums: 'Your teeth and gums',
+      legendTeethGums: 'Oral health questionnaire',
       q1: '1. Do you think you might have gum disease?',
       q3: '2. Have you ever had treatment for gum disease such as scaling and ' +
         'root planing, sometimes called “deep cleaning”?',
@@ -380,11 +434,15 @@
       q2Good: 'Good',
       q2Fair: 'Fair',
       q2Poor: 'Poor',
-      submitBtn: 'Get my estimate',
-      resultLabel: 'Estimated likelihood of severe periodontitis',
+      submitBtn: 'Calculate the estimate',
+      resultLabel: 'Screening result for severe periodontitis',
+      high: 'High risk',
+      low: 'Low risk',
+      probSummary: 'Show the predicted probability',
+      thrNote: (t) => `High risk means a predicted probability of ${t}% or more.`,
       alwaysCaveat: 'This is a screening estimate, not a diagnosis. Periodontitis ' +
-        'is diagnosed by a dental examination. If you have any of the symptoms ' +
-        'above, see a dentist regardless of this result.',
+        'is diagnosed by a dental examination. If the patient has any of the ' +
+        'symptoms above, advise a dentist visit regardless of this result.',
       aboutSummary: 'About this tool',
       aboutP1: 'This estimate comes from a logistic regression model built from ' +
         'a research project validating short questionnaires as a periodontitis ' +
@@ -401,10 +459,10 @@
         'translated into Dutch. The model was fitted to answers given to that ' +
         'Dutch version, so its measured accuracy applies to the Dutch wording; ' +
         'the English items have not been separately validated in this setting.',
-      aboutLi2: 'The development sample was not a general population: it came ' +
-        'from hospital and periodontal-care cohorts, so the mix of people who ' +
-        'did and didn’t have severe periodontitis is not necessarily the same ' +
-        'as in the general population.',
+      aboutLi2: 'The model was developed in internal medicine outpatients, not in ' +
+        'the general population. In a periodontology clinic, where severe ' +
+        'periodontitis is more common, it ranked patients equally well but its ' +
+        'predicted probabilities were too low.',
       aboutLi3: 'Nothing you type into the form — your age, answers, or ' +
         'result — is transmitted, logged, or stored anywhere. The ' +
         'calculation runs entirely in your browser.',
@@ -415,20 +473,47 @@
       aboutLi5: 'This is a research prototype, not a certified medical device ' +
         'or clinical decision tool.',
       restartBtn: 'Start over',
-      footerText: 'Research prototype',
+      inTen: (k) => `about ${k} in 10 people with these answers have severe periodontitis`,
+      oneIn: (k) => `about 1 in ${k} people with these answers have severe periodontitis`,
+      highTitle: 'Advice',
+      highAsk: 'Ask the patient: do you have a dentist, and are your gums being ' +
+        'checked or treated for gum disease?',
+      highYes: 'Yes: advise the patient to continue that care and to mention this result.',
+      highNo: 'No: advise a visit to a dentist or periodontist for a gum examination.',
+      lowTitle: 'Advice',
+      lowAdvice: 'No specific advice now: routine dental check-ups, and a dentist ' +
+        'visit if gum complaints appear.',
+      footerText: 'Research prototype by Elena Stamatelou',
       footerSource: 'source',
+      whyTitle: 'Why this result?',
+      whyIntro: 'Compared with the average patient of the study the model was built on, ' +
+        'these answers raised (▲) or lowered (▼) the estimate:',
+      whySymptoms: (k, names) => `Gum questions 1–5: ${k} of 5 answered yes` +
+        (names.length ? ` (${names.join(', ')})` : ''),
+      symptomNames: { Q1_gum_disease: 'gum disease', Q3_gum_treatment: 'gum treatment',
+        Q4_loose_teeth: 'loose teeth', Q5_bone_loss: 'bone loss',
+        Q6_tooth_appearance: 'tooth that doesn’t look right' },
+      whyAge: (a) => `Age ${a}`,
+      whySmokes: 'Smokes',
+      whyNoSmoke: 'Does not smoke',
+      whyQ2: (r) => `Rates teeth and gums as ${r}`,
+      effect: { up3: '▲ strongly raises', up2: '▲ raises', up1: '▲ slightly raises',
+        none: 'hardly any effect', down1: '▼ slightly lowers', down2: '▼ lowers',
+        down3: '▼ strongly lowers' },
+      whyHowSummary: 'How to read this',
+      whyHow: 'The bars are SHAP values (SHapley Additive exPlanations). For this model ' +
+        'they show exactly how much each answer moves the estimate compared with the ' +
+        'average answer of the 341 patients the model was developed on: to the right it ' +
+        'raises the estimate, to the left it lowers it. They explain the calculation of ' +
+        'the model, not the cause of the disease, and a patient without complaints can ' +
+        'still have periodontitis.',
     },
     nl: {
       docTitle: 'Parodontitis-risicoscreening — prototype',
       h1: 'Parodontitis-risicoscreening',
-      bannerTitle: 'Prototype — geen gevalideerde tool.',
-      bannerBody: 'Deze pagina demonstreert een statistisch model uit een lopend ' +
-        'onderzoeksproject. De onderstaande vragen zijn de gepubliceerde ' +
-        'Nederlandse vertaling uit het oorspronkelijke onderzoek (Verhulst et ' +
-        'al., 2019, aanvullend materiaal). Gebruik dit niet om ' +
-        'gezondheidsbeslissingen op te baseren. Zie “Over deze tool” na het ' +
-        'invullen.',
-      legendAboutYou: 'Over u',
+      subtitle: 'Voor de zorgverlener: lees elke vraag letterlijk voor ' +
+        'aan de patiënt en vink het antwoord van de patiënt aan.',
+      legendAboutYou: 'Over de patiënt',
       ageLabel: 'Leeftijd (jaren)',
       sexLabel: 'Geslacht',
       female: 'Vrouw',
@@ -436,7 +521,7 @@
       smokingQ: 'Rookt u op dit moment?',
       no: 'Nee',
       yes: 'Ja',
-      legendTeethGums: 'Uw tanden en tandvlees',
+      legendTeethGums: 'Mondgezondheidsvragenlijst',
       q1: '1. Denkt u dat u een tandvleesaandoening heeft, ook wel gingivitis of parodontitis genoemd?',
       q3: '2. Bent u wel eens voor een tandvleesaandoening behandeld, soms ook wel “diep schoonmaken” of “pocket behandeling” genoemd?',
       q4: '3. Heeft u wel eens last van losstaande tanden gehad, zonder dat daar een ongeluk of trauma aan vooraf ging?',
@@ -448,12 +533,16 @@
       q2Good: 'Goed',
       q2Fair: 'Matig',
       q2Poor: 'Slecht',
-      submitBtn: 'Bereken mijn schatting',
-      resultLabel: 'Geschatte kans op ernstige parodontitis',
+      submitBtn: 'Bereken de schatting',
+      resultLabel: 'Screeningsuitslag voor ernstige parodontitis',
+      high: 'Hoog risico',
+      low: 'Laag risico',
+      probSummary: 'Toon de voorspelde kans',
+      thrNote: (t) => `Hoog risico betekent een voorspelde kans van ${t}% of meer.`,
       alwaysCaveat: 'Dit is een screeningsschatting, geen diagnose. Parodontitis ' +
-        'wordt vastgesteld door een tandheelkundig onderzoek. Heeft u een van ' +
-        'de klachten hierboven, ga dan sowieso naar de tandarts, ongeacht deze ' +
-        'uitslag.',
+        'wordt vastgesteld door een tandheelkundig onderzoek. Heeft de patiënt een ' +
+        'van de klachten hierboven, adviseer dan sowieso een bezoek aan de ' +
+        'tandarts, ongeacht deze uitslag.',
       aboutSummary: 'Over deze tool',
       aboutP1: 'Deze schatting komt van een logistisch-regressiemodel, ' +
         'ontwikkeld in een onderzoeksproject dat korte vragenlijsten valideert ' +
@@ -471,10 +560,10 @@
         'aanvullend materiaal) — dichter bij de vraagtekst waarop het model ' +
         'is gevalideerd dan de Engelse bewerking op deze pagina, maar dit ' +
         'webformulier zelf is niet opnieuw en apart gevalideerd.',
-      aboutLi2: 'De ontwikkelingssteekproef is geen algemene populatie: de ' +
-        'patiënten kwamen uit ziekenhuis- en parodontologiepraktijken, dus ' +
-        'de verhouding mensen met en zonder ernstige parodontitis is niet per ' +
-        'se hetzelfde als in de algemene bevolking.',
+      aboutLi2: 'Het model is ontwikkeld bij poliklinische patiënten van de Interne ' +
+        'Geneeskunde, niet in de algemene bevolking. In een parodontologiekliniek, ' +
+        'waar ernstige parodontitis vaker voorkomt, rangschikte het patiënten even ' +
+        'goed, maar waren de voorspelde kansen te laag.',
       aboutLi3: 'Niets van wat u in het formulier invult — uw leeftijd, ' +
         'antwoorden of uitslag — wordt verzonden, gelogd of ergens ' +
         'opgeslagen. De berekening gebeurt volledig in uw browser.',
@@ -486,8 +575,40 @@
       aboutLi5: 'Dit is een onderzoeksprototype, geen gecertificeerd medisch ' +
         'hulpmiddel of klinisch beslissingsinstrument.',
       restartBtn: 'Opnieuw beginnen',
-      footerText: 'Onderzoeksprototype',
+      inTen: (k) => `ongeveer ${k} op de 10 mensen met deze antwoorden hebben ernstige parodontitis`,
+      oneIn: (k) => `ongeveer 1 op de ${k} mensen met deze antwoorden heeft ernstige parodontitis`,
+      highTitle: 'Advies',
+      highAsk: 'Vraag de patiënt: heeft u een tandarts, en wordt uw tandvlees ' +
+        'gecontroleerd of behandeld voor een tandvleesaandoening?',
+      highYes: 'Ja: adviseer die zorg voort te zetten en deze uitslag te noemen.',
+      highNo: 'Nee: adviseer een bezoek aan een tandarts of parodontoloog voor een tandvleesonderzoek.',
+      lowTitle: 'Advies',
+      lowAdvice: 'Nu geen specifiek advies: gewone tandheelkundige controles, en ' +
+        'naar de tandarts bij tandvleesklachten.',
+      footerText: 'Onderzoeksprototype van Elena Stamatelou',
       footerSource: 'broncode',
+      whyTitle: 'Waarom deze uitslag?',
+      whyIntro: 'Vergeleken met de gemiddelde patiënt uit het onderzoek waarop het model ' +
+        'is gebouwd, verhoogden (▲) of verlaagden (▼) deze antwoorden de schatting:',
+      whySymptoms: (k, names) => `Tandvleesvragen 1–5: ${k} van de 5 met ja beantwoord` +
+        (names.length ? ` (${names.join(', ')})` : ''),
+      symptomNames: { Q1_gum_disease: 'tandvleesaandoening', Q3_gum_treatment: 'tandvleesbehandeling',
+        Q4_loose_teeth: 'losstaande tanden', Q5_bone_loss: 'botverlies',
+        Q6_tooth_appearance: 'tand die er niet goed uitziet' },
+      whyAge: (a) => `Leeftijd ${a}`,
+      whySmokes: 'Rookt',
+      whyNoSmoke: 'Rookt niet',
+      whyQ2: (r) => `Beoordeelt tanden en tandvlees als ${r}`,
+      effect: { up3: '▲ verhoogt sterk', up2: '▲ verhoogt', up1: '▲ verhoogt licht',
+        none: 'nauwelijks effect', down1: '▼ verlaagt licht', down2: '▼ verlaagt',
+        down3: '▼ verlaagt sterk' },
+      whyHowSummary: 'Zo leest u dit',
+      whyHow: 'De balken zijn SHAP-waarden (SHapley Additive exPlanations). Voor dit model ' +
+        'laten ze precies zien hoeveel elk antwoord de schatting verschuift ten opzichte ' +
+        'van het gemiddelde antwoord van de 341 patiënten waarop het model is ontwikkeld: ' +
+        'naar rechts verhoogt het de schatting, naar links verlaagt het die. Ze verklaren ' +
+        'de berekening van het model, niet de oorzaak van de ziekte, en een patiënt zonder ' +
+        'klachten kan toch parodontitis hebben.',
     },
   };
 
@@ -501,6 +622,93 @@
     document.querySelectorAll('.lang-btn').forEach((btn) => {
       btn.setAttribute('aria-pressed', btn.dataset.lang === lang ? 'true' : 'false');
     });
+    currentLang = lang;
+    if (lastRisk != null) showAdvice(lastRisk);
+    if (lastAnswers != null) showWhy(lastAnswers);
+  }
+
+  let currentLang = 'en';
+  let lastRisk = null;
+  let lastAnswers = null;
+
+  // "Why this result": the SHAP value of each model input (explainSevereRisk in model.js), largest
+  // first. Bars are scaled to this patient's largest value, but never to less than 1 (log-odds), so
+  // small effects stay small; the words come from the size on the log-odds scale.
+  function effectKey(v) {
+    const a = Math.abs(v);
+    const level = a >= 0.75 ? 3 : a >= 0.3 ? 2 : a >= 0.1 ? 1 : 0;
+    return level === 0 ? 'none' : (v > 0 ? 'up' : 'down') + level;
+  }
+
+  function showWhy(answers) {
+    const box = document.getElementById('why');
+    if (typeof explainSevereRisk !== 'function' || !MODEL.trainingMeans) {
+      box.classList.add('hidden');                     // model.js exported without the reference
+      return;
+    }
+    const t = I18N[currentLang];
+    const { values, inputs } = explainSevereRisk(answers);
+    const scale = Math.max(1, ...Object.values(values).map(Math.abs));
+    const q2Words = [null, t.q2Excellent, t.q2VeryGood, t.q2Good, t.q2Fair, t.q2Poor];
+    const label = {
+      symptom_count: t.whySymptoms(inputs.symptom_count,
+        SYMPTOM_KEYS.filter((k) => answers[k]).map((k) => t.symptomNames[k])),
+      Age: t.whyAge(answers.Age),
+      Smoking: answers.Smoking ? t.whySmokes : t.whyNoSmoke,
+      Q2_own_teeth_gum_health: t.whyQ2(q2Words[answers.Q2_own_teeth_gum_health].toLowerCase()),
+      Sex: answers.Sex === 'male' ? t.male : t.female,
+    };
+    const rows = document.getElementById('why-rows');
+    rows.replaceChildren();
+    Object.keys(values).sort((a, b) => Math.abs(values[b]) - Math.abs(values[a])).forEach((key) => {
+      const v = values[key];
+      const kind = effectKey(v);
+      const dir = kind === 'none' ? 'none' : kind.slice(0, -1);
+      const row = document.createElement('div');
+      row.className = 'why-row';
+      const name = document.createElement('span');
+      name.textContent = label[key];
+      const bar = document.createElement('span');
+      bar.className = 'why-bar';
+      bar.setAttribute('aria-hidden', 'true');
+      if (dir !== 'none') {
+        const fill = document.createElement('span');
+        fill.className = dir;
+        fill.style.width = `${Math.min(50, (Math.abs(v) / scale) * 50)}%`;
+        bar.append(fill);
+      }
+      const effect = document.createElement('span');
+      effect.className = 'why-effect ' + dir;
+      effect.textContent = t.effect[kind];
+      row.append(name, bar, effect);
+      rows.append(row);
+    });
+    box.classList.remove('hidden');
+  }
+
+  // The result in words and the advice (high: ask about dental care first; low: routine care), at the
+  // operating threshold of the model.
+  function showAdvice(risk) {
+    const t = I18N[currentLang];
+    const isHigh = risk >= MODEL.operatingThreshold;
+    resultNumber.textContent = isHigh ? t.high : t.low;
+    resultNumber.className = 'result-number ' + (isHigh ? 'is-high' : 'is-low');
+    document.getElementById('result-pct').textContent = `${Math.round(risk * 100)}%`;
+    document.getElementById('thr-note').textContent = t.thrNote(Math.round(MODEL.operatingThreshold * 100));
+    document.getElementById('result-words').textContent =
+      risk >= 0.5 ? t.inTen(Math.round(risk * 10)) : t.oneIn(Math.max(1, Math.round(1 / risk)));
+    const box = document.getElementById('advice');
+    box.replaceChildren();
+    const lines = risk >= MODEL.operatingThreshold
+      ? [[t.highTitle, true], [t.highAsk], [t.highYes], [t.highNo]]
+      : [[t.lowTitle, true], [t.lowAdvice]];
+    box.className = 'advice' + (risk >= MODEL.operatingThreshold ? ' high' : '');
+    for (const [text, bold] of lines) {
+      const p = document.createElement('p');
+      if (bold) { const b = document.createElement('b'); b.textContent = text; p.append(b); }
+      else p.textContent = text;
+      box.append(p);
+    }
   }
 
   document.querySelectorAll('.lang-btn').forEach((btn) => {
@@ -546,7 +754,10 @@
     };
 
     const risk = predictSevereRisk(answers);
-    resultNumber.textContent = `${Math.round(risk * 100)}%`;
+    lastRisk = risk;
+    lastAnswers = answers;
+    showAdvice(risk);
+    showWhy(answers);
 
     form.classList.add('hidden');
     resultScreen.classList.remove('hidden');
@@ -555,6 +766,10 @@
 
   document.getElementById('restart-btn').addEventListener('click', () => {
     form.reset();
+    lastRisk = null;
+    lastAnswers = null;
+    document.getElementById('why').classList.add('hidden');
+    document.getElementById('prob-details').open = false;
     submitBtn.disabled = true;
     resultScreen.classList.add('hidden');
     form.classList.remove('hidden');

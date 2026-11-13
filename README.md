@@ -42,6 +42,16 @@ python3 test/verify_against_python.py
 (Requires the research repo's venv — joblib, scikit-learn, pandas — and
 access to the model bundle.)
 
+## "Why this result?"
+
+The result screen shows which answers raised or lowered the predicted
+probability. These are the SHAP values of the model (training cohort as
+background). For a logistic regression they are exact: coefficient ×
+(scaled answer − training mean), computed by `explainSevereRisk()` in
+`model.js` from the training means that `export_model_js.py` writes into it.
+On 300 random answer sets they agreed with Python's `shap.LinearExplainer`
+to within 1e-15.
+
 ## Deploying to GitHub Pages
 
 1. Push this directory to a public GitHub repo.
