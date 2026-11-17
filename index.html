@@ -16,243 +16,103 @@
 <meta name="twitter:card" content="summary_large_image">
 <style>
   :root {
-    --bg: #f7f7f5;
-    --panel: #ffffff;
-    --text: #1c1c1a;
-    --muted: #5b5b56;
-    --border: #ddddd8;
-    --accent: #2f6f5e;
-    --accent-contrast: #ffffff;
-    --warn-bg: #fdf3e7;
-    --warn-border: #e8c99a;
-    --warn-text: #6b4a15;
+    --bg: #f5f5f7; --card: #ffffff; --text: #1d1d1f; --muted: #6e6e73; --hair: #d2d2d7;
+    --blue: #0071e3; --blue-soft: #e8f1fc; --orange: #e8590c; --orange-soft: #fdf0e8;
+    --seg: #e9e9ee; --radius: 18px;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.06);
   }
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    line-height: 1.5;
-  }
-  main {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 1.5rem 1.25rem 4rem;
-  }
-  .lang-toggle {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.4rem;
-    margin-bottom: 0.5rem;
-  }
-  .lang-btn {
-    border: 1px solid var(--border);
-    background: var(--panel);
-    color: var(--muted);
-    border-radius: 999px;
-    padding: 0.3rem 0.8rem;
-    font-size: 0.8rem;
-    font: inherit;
-    cursor: pointer;
-  }
-  .lang-btn[aria-pressed="true"] {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--accent-contrast);
-    font-weight: 600;
-  }
-  h1 {
-    font-size: 1.4rem;
-    margin: 1rem 0 0.25rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-  }
-  h1 img { width: 40px; height: 40px; flex: none; }
-  .subtitle {
-    color: var(--muted);
-    margin: 0 0 1.25rem;
-    font-size: 0.95rem;
-  }
-  .panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 1.25rem;
-    margin-bottom: 1.25rem;
-  }
-  fieldset {
-    border: none;
-    padding: 0;
-    margin: 0 0 1.25rem;
-  }
-  legend {
-    font-weight: 600;
-    padding: 0;
-    margin-bottom: 0.5rem;
-  }
-  .question {
-    margin-bottom: 1.1rem;
-  }
-  .question label.q-text {
-    display: block;
-    margin-bottom: 0.45rem;
-    font-weight: 500;
-  }
-  .options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  .option {
-    position: relative;
-  }
-  .option input {
-    position: absolute;
-    opacity: 0;
-    inset: 0;
-    cursor: pointer;
-  }
-  .option span {
-    display: inline-block;
-    padding: 0.45rem 0.9rem;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    font-size: 0.9rem;
-    color: var(--text);
-    background: var(--bg);
-  }
-  .option input:checked + span {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--accent-contrast);
-  }
-  .option input:focus-visible + span {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-  input[type="number"] {
-    width: 100%;
-    max-width: 140px;
-    padding: 0.5rem 0.6rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 1rem;
-  }
-  button {
-    font: inherit;
-  }
-  #submit-btn {
-    width: 100%;
-    padding: 0.85rem;
-    border: none;
-    border-radius: 10px;
-    background: var(--accent);
-    color: var(--accent-contrast);
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  #submit-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-  .hidden { display: none; }
-  .field-msg { color: var(--warn-text); font-size: 0.85rem; margin: 0.35rem 0 0; }
-  .result-number {
-    font-size: 2.6rem;
-    font-weight: 700;
-    margin: 0.25rem 0 0.1rem;
-  }
-  .result-label {
-    color: var(--muted);
-    margin: 0 0 1rem;
-    font-size: 0.95rem;
-  }
-  .result-words {
-    color: var(--muted);
-    margin: 0 0 1rem;
-  }
-  .advice {
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-    font-size: 0.95rem;
-  }
-  .result-number.is-high { color: var(--warn-text); }
-  .result-number.is-low { color: var(--accent); }
-  .advice.high { border-color: var(--warn-border); background: var(--warn-bg); color: var(--warn-text); }
-  .advice p { margin: 0.25rem 0; }
-  /* "Why this result": one row per model input, a bar from the centre line (right = raises, left =
-     lowers the estimate) and the effect in words; SHAP values of the model (explainSevereRisk). */
-  .why { margin-top: 1rem; }
-  .why h2 { font-size: 1rem; margin: 0 0 0.25rem; }
-  .why-intro { font-size: 0.9rem; color: var(--muted); margin: 0 0 0.6rem; }
-  .why-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 140px 7.5rem;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.35rem 0;
-    border-top: 1px solid var(--border);
-    font-size: 0.9rem;
-  }
-  .why-row:first-of-type { border-top: none; }
-  .why-bar { position: relative; height: 12px; }
-  .why-bar::before {                       /* centre line = the average patient */
-    content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px;
-    border-left: 1px solid var(--muted);
-  }
-  .why-bar span { position: absolute; top: 0; height: 100%; border-radius: 2px; }
-  .why-bar span.up { left: 50%; background: #c98a3a; }
-  .why-bar span.down { right: 50%; background: var(--accent); }
-  .why-effect { font-size: 0.85rem; }
-  .why-effect.up { color: var(--warn-text); }
-  .why-effect.down { color: var(--accent); }
-  .why-effect.none { color: var(--muted); }
-  .why details { margin-top: 0.6rem; }
-  @media (max-width: 480px) {
-    .why-row { grid-template-columns: minmax(0, 1fr) 64px 6.2rem; gap: 0.4rem; font-size: 0.85rem; }
-    .why-effect { font-size: 0.8rem; }
-  }
-  .always-caveat {
-    border-left: 3px solid var(--accent);
-    padding: 0.15rem 0 0.15rem 0.85rem;
-    margin: 1rem 0;
-    font-size: 0.92rem;
-  }
-  details {
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-    margin-top: 1rem;
-  }
-  details summary {
-    cursor: pointer;
-    font-weight: 600;
-  }
-  details p, details ul {
-    font-size: 0.9rem;
-    color: var(--muted);
-  }
-  #restart-btn {
-    margin-top: 1.25rem;
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: transparent;
-    color: var(--text);
-    cursor: pointer;
-  }
-  footer {
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.8rem;
-    margin-top: 2rem;
+  body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.47;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased; }
+  main { max-width: 680px; margin: 0 auto; padding: 1rem 1.25rem 7rem; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin: .5rem 0 1.25rem; }
+  .brand { display: flex; align-items: center; gap: .6rem; font-weight: 600; font-size: .95rem; }
+  .brand img { width: 30px; height: 30px; }
+  .segmented { display: inline-flex; background: var(--seg); border-radius: 10px; padding: 2px; gap: 2px; }
+  .segmented button, .seg-opt span {
+    border: 0; background: transparent; font: inherit; color: var(--text); border-radius: 8px; cursor: pointer; }
+  .segmented button { padding: .3rem .8rem; font-size: .82rem; font-weight: 500; }
+  .segmented button[aria-pressed="true"] { background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  h1 { font-size: 2.1rem; line-height: 1.12; letter-spacing: -.02em; font-weight: 700; margin: 0 0 .5rem; }
+  .subtitle { color: var(--muted); font-size: 1.02rem; margin: 0 0 1.5rem; }
+  .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.4rem 1.4rem .4rem;
+    margin-bottom: 1.25rem; border: 0; }
+  .card-title { float: left; width: 100%; font-size: .78rem; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 1rem; padding: 0; }
+  .card-title + * { clear: both; }
+  .question { padding: 0 0 1.15rem; margin-bottom: 1.15rem; border-bottom: 1px solid #f0f0f2; scroll-margin: 90px;
+    border-radius: 10px; transition: background .3s; }
+  .question:last-child { border-bottom: 0; margin-bottom: 0; }
+  .q-label { display: block; font-size: .78rem; font-weight: 600; color: var(--blue); margin-bottom: .2rem; }
+  .q-text { display: block; font-size: 1.05rem; font-weight: 500; margin-bottom: .7rem; }
+  .question.read-aloud .q-text::before { content: "\201C"; color: var(--muted); }
+  .question.read-aloud .q-text::after { content: "\201D"; color: var(--muted); }
+  .options { display: flex; background: var(--seg); border-radius: 11px; padding: 2px; gap: 2px; }
+  .seg-opt { position: relative; flex: 1; }
+  .seg-opt input { position: absolute; opacity: 0; inset: 0; cursor: pointer; margin: 0; }
+  .seg-opt span { display: block; text-align: center; padding: .6rem .3rem; min-height: 44px; font-size: .93rem;
+    line-height: 1.5; }
+  .seg-opt input:checked + span { background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,.14); font-weight: 600;
+    color: var(--blue); }
+  .seg-opt input:focus-visible + span { outline: 2px solid var(--blue); outline-offset: 1px; }
+  .q2 .seg-opt span { font-size: .85rem; }
+  .age-wrap { display: inline-flex; align-items: center; background: var(--seg); border-radius: 11px; padding: 0 .9rem 0 0; }
+  .age-wrap input { width: 6rem; border: 0; background: transparent; font: inherit; font-size: 1.1rem; padding: .65rem .9rem;
+    color: var(--text); outline: none; }
+  .age-wrap span { color: var(--muted); }
+  .field-msg { color: var(--orange); font-size: .85rem; margin: .4rem 0 0; }
+  .question.missing { background: var(--orange-soft); box-shadow: 0 0 0 8px var(--orange-soft); }
+  .question.missing .q-label { color: var(--orange); }
+  .hidden { display: none !important; }
+  .dock { position: fixed; left: 0; right: 0; bottom: 0; padding: .75rem 1.25rem calc(.75rem + env(safe-area-inset-bottom));
+    background: rgba(245,245,247,.82); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-top: 1px solid rgba(0,0,0,.06); }
+  .dock-inner { max-width: 680px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; }
+  .progress { flex: 1; font-size: .85rem; color: var(--muted); }
+  .bar { height: 4px; background: var(--seg); border-radius: 4px; margin-top: .35rem; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--blue); border-radius: 4px; transition: width .25s; }
+  .btn { border: 0; border-radius: 980px; background: var(--blue); color: #fff; font: inherit; font-weight: 600;
+    font-size: 1rem; padding: .8rem 1.6rem; cursor: pointer; }
+  .btn.secondary { background: var(--seg); color: var(--blue); width: 100%; margin: 1rem 0 1.4rem; }
+  .result-label { font-size: .78rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+    margin: 0 0 .4rem; }
+  .result-number { font-size: 2.6rem; font-weight: 700; letter-spacing: -.02em; margin: 0 0 1rem; display: flex;
+    align-items: center; gap: .6rem; }
+  .result-number::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: currentColor; }
+  .result-number.is-high { color: var(--orange); }
+  .result-number.is-low { color: var(--blue); }
+  .advice { border-radius: 14px; padding: .9rem 1.1rem; background: var(--blue-soft); font-size: .97rem; }
+  .advice.high { background: var(--orange-soft); }
+  .advice p { margin: .3rem 0; }
+  .why { margin-top: 1.5rem; }
+  .why h2 { font-size: 1.15rem; margin: 0 0 .25rem; }
+  .why-intro { font-size: .9rem; color: var(--muted); margin: 0 0 .7rem; }
+  .why-row { display: grid; grid-template-columns: minmax(0, 1fr) 130px 8rem; align-items: center; gap: .7rem;
+    padding: .55rem 0; border-top: 1px solid #f0f0f2; font-size: .93rem; }
+  .why-row:first-of-type { border-top: 0; }
+  .why-bar { position: relative; height: 10px; background: #f2f2f5; border-radius: 6px; }
+  .why-bar::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; border-left: 1px solid var(--hair); }
+  .why-bar span { position: absolute; top: 0; height: 100%; border-radius: 6px; }
+  .why-bar span.up { left: 50%; background: var(--orange); }
+  .why-bar span.down { right: 50%; background: var(--blue); }
+  .why-effect { font-size: .85rem; }
+  .why-effect.up { color: var(--orange); } .why-effect.down { color: var(--blue); } .why-effect.none { color: var(--muted); }
+  details { border-top: 1px solid #f0f0f2; padding: .85rem 0; margin: 0; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--blue); list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after { content: " ›"; }
+  details[open] summary::after { content: " ⌄"; }
+  details p, details ul { font-size: .9rem; color: var(--muted); }
+  .why details { border-top: 0; padding-top: .4rem; }
+  .always-caveat { font-size: .9rem; color: var(--muted); margin: 1.2rem 0 .4rem; }
+  footer { text-align: center; color: var(--muted); font-size: .8rem; margin-top: 2rem; }
+  footer a { color: var(--blue); text-decoration: none; }
+  @media (max-width: 520px) {
+    h1 { font-size: 1.7rem; }
+    .q2 .options { flex-wrap: wrap; }
+    .q2 .seg-opt { flex: 1 1 30%; }
+    .why-row { grid-template-columns: minmax(0, 1fr) 60px 6.4rem; gap: .45rem; font-size: .86rem; }
   }
 </style>
 <script data-goatcounter="https://perio-screening.goatcounter.com/count"
@@ -260,112 +120,72 @@
 </head>
 <body>
 <main>
-  <div class="lang-toggle">
-    <button type="button" class="lang-btn" data-lang="en">EN</button>
-    <button type="button" class="lang-btn" data-lang="nl">NL</button>
+  <div class="topbar">
+    <div class="brand"><img src="logo.svg" alt=""><span data-i18n="h1"></span></div>
+    <div class="segmented" aria-label="Language">
+      <button type="button" class="lang-btn" data-lang="en">EN</button>
+      <button type="button" class="lang-btn" data-lang="nl">NL</button>
+    </div>
   </div>
 
-  <h1><img src="logo.svg" alt=""><span data-i18n="h1"></span></h1>
   <p class="subtitle" data-i18n="subtitle"></p>
 
-  <form id="quiz" class="panel">
-    <fieldset>
-      <legend data-i18n="legendAboutYou"></legend>
-
-      <div class="question">
+  <form id="quiz" novalidate>
+    <fieldset class="card">
+      <legend class="card-title" data-i18n="legendAboutYou"></legend>
+      <div class="question" data-name="age">
         <label class="q-text" for="age" data-i18n="ageLabel"></label>
-        <input type="number" id="age" name="age" min="18" max="100" step="1" inputmode="numeric" required>
+        <div class="age-wrap"><input type="number" id="age" name="age" min="18" max="100" step="1" inputmode="numeric"
+          required><span data-i18n="years"></span></div>
         <p class="field-msg hidden" id="age-msg" data-i18n="ageInvalid"></p>
       </div>
-
-      <div class="question">
+      <div class="question" data-name="sex">
         <span class="q-text" data-i18n="sexLabel"></span>
-        <div class="options">
-          <label class="option">
-            <input type="radio" name="sex" value="female" required>
-            <span data-i18n="female"></span>
-          </label>
-          <label class="option">
-            <input type="radio" name="sex" value="male">
-            <span data-i18n="male"></span>
-          </label>
-        </div>
+        <div class="options" role="radiogroup"><label class="seg-opt"><input type="radio" name="sex" value="female" required><span data-i18n="female"></span></label><label class="seg-opt"><input type="radio" name="sex" value="male"><span data-i18n="male"></span></label></div>
       </div>
-
-      <div class="question">
+      <div class="question read-aloud" data-name="smoking">
+        <span class="q-label" data-i18n="labSmoking"></span>
         <span class="q-text" data-i18n="smokingQ"></span>
-        <div class="options">
-          <label class="option">
-            <input type="radio" name="smoking" value="no" required>
-            <span data-i18n="no"></span>
-          </label>
-          <label class="option">
-            <input type="radio" name="smoking" value="yes">
-            <span data-i18n="yes"></span>
-          </label>
-        </div>
+        <div class="options" role="radiogroup"><label class="seg-opt"><input type="radio" name="smoking" value="no" required><span data-i18n="no"></span></label><label class="seg-opt"><input type="radio" name="smoking" value="yes"><span data-i18n="yes"></span></label></div>
       </div>
     </fieldset>
 
-    <fieldset>
-      <legend data-i18n="legendTeethGums"></legend>
-
-      <div class="question">
+    <fieldset class="card">
+      <legend class="card-title" data-i18n="legendTeethGums"></legend>
+      <div class="question read-aloud" data-name="q1">
+        <span class="q-label" data-i18n="labQ1"></span>
         <span class="q-text" data-i18n="q1"></span>
-        <div class="options">
-          <label class="option"><input type="radio" name="q1" value="no" required><span data-i18n="no"></span></label>
-          <label class="option"><input type="radio" name="q1" value="yes"><span data-i18n="yes"></span></label>
-        </div>
+        <div class="options" role="radiogroup"><label class="seg-opt"><input type="radio" name="q1" value="no" required><span data-i18n="no"></span></label><label class="seg-opt"><input type="radio" name="q1" value="yes"><span data-i18n="yes"></span></label></div>
       </div>
-
-      <div class="question">
+      <div class="question read-aloud" data-name="q3">
+        <span class="q-label" data-i18n="labQ3"></span>
         <span class="q-text" data-i18n="q3"></span>
-        <div class="options">
-          <label class="option"><input type="radio" name="q3" value="no" required><span data-i18n="no"></span></label>
-          <label class="option"><input type="radio" name="q3" value="yes"><span data-i18n="yes"></span></label>
-        </div>
+        <div class="options" role="radiogroup"><label class="seg-opt"><input type="radio" name="q3" value="no" required><span data-i18n="no"></span></label><label class="seg-opt"><input type="radio" name="q3" value="yes"><span data-i18n="yes"></span></label></div>
       </div>
-
-      <div class="question">
+      <div class="question read-aloud" data-name="q4">
+        <span class="q-label" data-i18n="labQ4"></span>
         <span class="q-text" data-i18n="q4"></span>
-        <div class="options">
-          <label class="option"><input type="radio" name="q4" value="no" required><span data-i18n="no"></span></label>
-          <label class="option"><input type="radio" name="q4" value="yes"><span data-i18n="yes"></span></label>
-        </div>
+        <div class="options" role="radiogroup"><label class="seg-opt"><input type="radio" name="q4" value="no" required><span data-i18n="no"></span></label><label class="seg-opt"><input type="radio" name="q4" value="yes"><span data-i18n="yes"></span></label></div>
       </div>
-
-      <div class="question">
+      <div class="question read-aloud" data-name="q5">
+        <span class="q-label" data-i18n="labQ5"></span>
         <span class="q-text" data-i18n="q5"></span>
-        <div class="options">
-          <label class="option"><input type="radio" name="q5" value="no" required><span data-i18n="no"></span></label>
-          <label class="option"><input type="radio" name="q5" value="yes"><span data-i18n="yes"></span></label>
-        </div>
+        <div class="options" role="radiogroup"><label class="seg-opt"><input type="radio" name="q5" value="no" required><span data-i18n="no"></span></label><label class="seg-opt"><input type="radio" name="q5" value="yes"><span data-i18n="yes"></span></label></div>
       </div>
-
-      <div class="question">
+      <div class="question read-aloud" data-name="q6">
+        <span class="q-label" data-i18n="labQ6"></span>
         <span class="q-text" data-i18n="q6"></span>
-        <div class="options">
-          <label class="option"><input type="radio" name="q6" value="no" required><span data-i18n="no"></span></label>
-          <label class="option"><input type="radio" name="q6" value="yes"><span data-i18n="yes"></span></label>
-        </div>
+        <div class="options" role="radiogroup"><label class="seg-opt"><input type="radio" name="q6" value="no" required><span data-i18n="no"></span></label><label class="seg-opt"><input type="radio" name="q6" value="yes"><span data-i18n="yes"></span></label></div>
       </div>
-
-      <div class="question">
+      <div class="question read-aloud q2" data-name="q2">
+        <span class="q-label" data-i18n="labQ2"></span>
         <span class="q-text" data-i18n="q2"></span>
-        <div class="options">
-          <label class="option"><input type="radio" name="q2" value="1" required><span data-i18n="q2Excellent"></span></label>
-          <label class="option"><input type="radio" name="q2" value="2"><span data-i18n="q2VeryGood"></span></label>
-          <label class="option"><input type="radio" name="q2" value="3"><span data-i18n="q2Good"></span></label>
-          <label class="option"><input type="radio" name="q2" value="4"><span data-i18n="q2Fair"></span></label>
-          <label class="option"><input type="radio" name="q2" value="5"><span data-i18n="q2Poor"></span></label>
-        </div>
+        <div class="options" role="radiogroup"><label class="seg-opt"><input type="radio" name="q2" value="1" required><span data-i18n="q2Excellent"></span></label><label class="seg-opt"><input type="radio" name="q2" value="2"><span data-i18n="q2VeryGood"></span></label><label class="seg-opt"><input type="radio" name="q2" value="3"><span data-i18n="q2Good"></span></label><label class="seg-opt"><input type="radio" name="q2" value="4"><span data-i18n="q2Fair"></span></label><label class="seg-opt"><input type="radio" name="q2" value="5"><span data-i18n="q2Poor"></span></label></div>
       </div>
     </fieldset>
-
-    <button type="submit" id="submit-btn" disabled data-i18n="submitBtn"></button>
   </form>
 
-  <section id="result-screen" class="panel hidden">
+  <section id="result-screen" class="card hidden" style="padding-bottom:.2rem">
     <p class="result-label" data-i18n="resultLabel"></p>
     <p class="result-number" id="result-number">—</p>
     <div class="advice" id="advice"></div>
@@ -382,40 +202,44 @@
       <summary data-i18n="probSummary"></summary>
       <p><b id="result-pct">—</b>: <span id="result-words"></span>. <span id="thr-note"></span></p>
     </details>
-
-    <div class="always-caveat" data-i18n="alwaysCaveat"></div>
-
+    <p class="always-caveat" data-i18n="alwaysCaveat"></p>
     <details>
       <summary data-i18n="aboutSummary"></summary>
       <p data-i18n="aboutP1"></p>
-      <ul>
-        <li data-i18n="aboutLi1"></li>
-        <li data-i18n="aboutLi2"></li>
-        <li data-i18n="aboutLi3"></li>
-        <li data-i18n="aboutLi4"></li>
-        <li data-i18n="aboutLi5"></li>
-      </ul>
+      <p data-i18n="aboutLi5"></p>
     </details>
-
-    <button type="button" id="restart-btn" data-i18n="restartBtn"></button>
+    <button type="button" id="restart-btn" class="btn secondary" data-i18n="restartBtn"></button>
   </section>
 
   <footer>
-    <span data-i18n="footerText"></span> · <a href="https://github.com/ElenaStamatelou/perio-screening-questionnaire-based-tool" data-i18n="footerSource"></a>
+    <span data-i18n="privacy"></span><br><span data-i18n="footerText"></span> · <a href="https://github.com/ElenaStamatelou/perio-screening-questionnaire-based-tool" data-i18n="footerSource"></a>
   </footer>
 </main>
+
+<div class="dock" id="dock">
+  <div class="dock-inner">
+    <div class="progress"><span id="progress-text"></span><div class="bar"><i id="progress-bar"></i></div></div>
+    <button type="submit" form="quiz" id="submit-btn" class="btn" data-i18n="submitBtn"></button>
+  </div>
+</div>
 
 <script src="model.js"></script>
 <script>
   const I18N = {
     en: {
+      labAge: 'Age', labSex: 'Sex', labSmoking: 'Smoking',
+      labQ1: 'Gum disease', labQ3: 'Gum treatment', labQ4: 'Loose teeth', labQ5: 'Bone loss',
+      labQ6: 'Tooth appearance', labQ2: 'Self-rated oral health',
+      years: 'years',
+      progress: (k, n) => `${k} of ${n} answered`,
+      complete: 'All answered',
+      privacy: 'Runs in your browser; nothing you enter is stored. Page visits are counted anonymously.',
       docTitle: 'Periodontitis screening — prototype',
       h1: 'Periodontitis screening',
-      subtitle: 'For the healthcare professional: read each question to the patient, ' +
-        'as written, and enter the age or tick the answer the patient gives.',
+      subtitle: 'Read each question to the patient and fill in the patient\'s answers.',
       ageInvalid: 'Enter the age in whole years, between 18 and 100.',
       legendAboutYou: 'About the patient',
-      ageLabel: 'Age (years)',
+      ageLabel: 'Age',
       sexLabel: 'Sex',
       female: 'Female',
       male: 'Male',
@@ -437,26 +261,15 @@
       q2Good: 'Good',
       q2Fair: 'Fair',
       q2Poor: 'Poor',
-      submitBtn: 'Calculate the estimate',
+      submitBtn: 'Show the result',
       resultLabel: 'Screening result for severe periodontitis',
       high: 'High risk',
       low: 'Low risk',
       probSummary: 'Show the predicted probability',
       thrNote: (t) => `High risk means a predicted probability of ${t}% or more.`,
-      alwaysCaveat: 'This is a screening estimate, not a diagnosis. Periodontitis ' +
-        'is diagnosed by a dental examination. If the patient has any of the ' +
-        'symptoms above, advise a dentist visit regardless of this result.',
+      alwaysCaveat: 'This screening result is not a diagnosis. Periodontitis is diagnosed by a dental examination. If the patient has any of the symptoms above, advise a dentist visit regardless of this result.',
       aboutSummary: 'About this tool',
-      aboutP1: 'This estimate comes from a logistic regression model built from ' +
-        'a research project validating short questionnaires as a periodontitis ' +
-        'screening aid. In internal cross-validation on 341 patients from two ' +
-        'Dutch medical outpatient cohorts (Amsterdam UMC, Department of ' +
-        'Internal Medicine), the model reached an AUC of approximately 0.78 ' +
-        '(a measure of how well it ranks people by risk) with calibration ' +
-        'close to observed rates. That is an estimate of performance on the ' +
-        'data it was built from, not a guarantee for you individually. A ' +
-        'manuscript describing this model (Stamatelou et al.) is currently in ' +
-        'preparation.',
+      aboutP1: 'This result comes from a machine-learning-based model, developed in a research project validating self-reported oral health questionnaires as a periodontitis screening aid. It was developed using 341 people from two Dutch medical outpatient cohorts (Amsterdam UMC, Department of Internal Medicine); severe periodontitis was defined as a score of 4 on the Community Periodontal Index of Treatment Needs (CPITN) in at least one sextant. The model and its validation are described in Stamatelou et al. (2027).',
       aboutLi1: 'The six questions above are the original English wording of ' +
         'the self-reported oral health items that Verhulst et al. (2019) ' +
         'translated into Dutch. The model was fitted to answers given to that ' +
@@ -481,7 +294,7 @@
       highTitle: 'Advice',
       highAsk: 'Ask the patient: do you have a dentist, and are your gums being ' +
         'checked or treated for gum disease?',
-      highYes: 'Yes: advise the patient to continue that care and to mention this result.',
+      highYes: 'Yes: advise the patient to continue that care.',
       highNo: 'No: advise a visit to a dentist or periodontist for a gum examination.',
       lowTitle: 'Advice',
       lowAdvice: 'No specific advice now: routine dental check-ups, and a dentist ' +
@@ -489,12 +302,11 @@
       footerText: 'Research prototype by Elena Stamatelou',
       footerSource: 'source',
       whyTitle: 'Why this result?',
-      whyIntro: 'Compared with the average patient of the study the model was built on, ' +
-        'these answers raised (▲) or lowered (▼) the estimate:',
+      whyIntro: 'The answers below raised (▲) or lowered (▼) the result:',
       whyItem: (name, yes) => `${name}: ${yes ? 'yes' : 'no'}`,
-      itemNames: { Q1_gum_disease: 'Self-perceived gum disease', Q3_gum_treatment: 'Previous gum treatment',
-        Q4_loose_teeth: 'Loose teeth', Q5_bone_loss: 'Bone loss around the teeth',
-        Q6_tooth_appearance: 'Tooth that doesn’t look right' },
+      itemNames: { Q1_gum_disease: 'Self-reported gum disease', Q3_gum_treatment: 'Self-reported gum treatment',
+        Q4_loose_teeth: 'Perceived loose teeth', Q5_bone_loss: 'Perceived bone loss around the teeth',
+        Q6_tooth_appearance: 'Concern about tooth appearance' },
       whyAge: (a) => `Age ${a}`,
       whySmokes: 'Smokes',
       whyNoSmoke: 'Does not smoke',
@@ -503,21 +315,22 @@
         none: 'hardly any effect', down1: '▼ slightly lowers', down2: '▼ lowers',
         down3: '▼ strongly lowers' },
       whyHowSummary: 'How to read this',
-      whyHow: 'The bars are SHAP values (SHapley Additive exPlanations). For this model ' +
-        'they show exactly how much each answer moves the estimate compared with the ' +
-        'average answer of the 341 patients the model was developed on: to the right it ' +
-        'raises the estimate, to the left it lowers it. They explain the calculation of ' +
-        'the model, not the cause of the disease, and a patient without complaints can ' +
-        'still have periodontitis.',
+      whyHow: 'Each bar shows how much an answer moved the result. The bars explain the result, not the cause of severe periodontitis; a patient without complaints can still have periodontitis. Details: Stamatelou et al. (2027). This is a research prototype, not a certified medical device or clinical decision tool.',
     },
     nl: {
+      labAge: 'Leeftijd', labSex: 'Geslacht', labSmoking: 'Roken',
+      labQ1: 'Tandvleesaandoening', labQ3: 'Tandvleesbehandeling', labQ4: 'Losstaande tanden', labQ5: 'Botverlies',
+      labQ6: 'Uiterlijk van een tand', labQ2: 'Eigen beoordeling mondgezondheid',
+      years: 'jaar',
+      progress: (k, n) => `${k} van ${n} beantwoord`,
+      complete: 'Alles beantwoord',
+      privacy: 'Werkt in uw browser; niets van wat u invult wordt opgeslagen. Paginabezoeken worden anoniem geteld.',
       docTitle: 'Parodontitis-screening — prototype',
       h1: 'Parodontitis-screening',
-      subtitle: 'Voor de zorgverlener: lees elke vraag letterlijk voor aan de patiënt ' +
-        'en vul de leeftijd in of vink het antwoord van de patiënt aan.',
+      subtitle: 'Lees elke vraag voor aan de patiënt en vul de antwoorden van de patiënt in.',
       ageInvalid: 'Vul de leeftijd in hele jaren in, tussen 18 en 100.',
       legendAboutYou: 'Over de patiënt',
-      ageLabel: 'Leeftijd (jaren)',
+      ageLabel: 'Leeftijd',
       sexLabel: 'Geslacht',
       female: 'Vrouw',
       male: 'Man',
@@ -536,28 +349,15 @@
       q2Good: 'Goed',
       q2Fair: 'Matig',
       q2Poor: 'Slecht',
-      submitBtn: 'Bereken de schatting',
+      submitBtn: 'Toon de uitslag',
       resultLabel: 'Screeningsuitslag voor ernstige parodontitis',
       high: 'Hoog risico',
       low: 'Laag risico',
       probSummary: 'Toon de voorspelde kans',
       thrNote: (t) => `Hoog risico betekent een voorspelde kans van ${t}% of meer.`,
-      alwaysCaveat: 'Dit is een screeningsschatting, geen diagnose. Parodontitis ' +
-        'wordt vastgesteld door een tandheelkundig onderzoek. Heeft de patiënt een ' +
-        'van de klachten hierboven, adviseer dan sowieso een bezoek aan de ' +
-        'tandarts, ongeacht deze uitslag.',
+      alwaysCaveat: 'Deze screeningsuitslag is geen diagnose. Parodontitis wordt vastgesteld door een tandheelkundig onderzoek. Heeft de patiënt een van de klachten hierboven, adviseer dan sowieso een bezoek aan de tandarts, ongeacht deze uitslag.',
       aboutSummary: 'Over deze tool',
-      aboutP1: 'Deze schatting komt van een logistisch-regressiemodel, ' +
-        'ontwikkeld in een onderzoeksproject dat korte vragenlijsten valideert ' +
-        'als hulpmiddel bij het screenen op parodontitis. In interne ' +
-        'kruisvalidatie op 341 patiënten uit twee Nederlandse cohorten van ' +
-        'medische poliklinieken (Amsterdam UMC, afdeling Interne ' +
-        'Geneeskunde) behaalde het model een AUC van ongeveer 0,78 (een maat ' +
-        'voor hoe goed het mensen naar risico rangschikt), met een kalibratie ' +
-        'die dicht bij de waargenomen percentages ligt. Dit is een schatting ' +
-        'van de prestaties op de gegevens waarop het model is gebouwd, geen ' +
-        'garantie voor u persoonlijk. Een manuscript dat dit model beschrijft ' +
-        '(Stamatelou et al.) is momenteel in voorbereiding.',
+      aboutP1: 'Deze uitslag komt van een op machine learning gebaseerd model, ontwikkeld in een onderzoeksproject dat vragenlijsten over zelfgerapporteerde mondgezondheid valideert als hulpmiddel bij het screenen op parodontitis. Het model is ontwikkeld met 341 personen uit twee Nederlandse cohorten van medische poliklinieken (Amsterdam UMC, afdeling Interne Geneeskunde); ernstige parodontitis werd gedefinieerd als een score van 4 op de Community Periodontal Index of Treatment Needs (CPITN) in ten minste één sextant. Het model en de validatie ervan worden beschreven in Stamatelou et al. (2027).',
       aboutLi1: 'De zes vragen hierboven zijn de gepubliceerde Nederlandse ' +
         'vertaling uit het oorspronkelijke onderzoek (Verhulst et al., 2019, ' +
         'aanvullend materiaal) — dichter bij de vraagtekst waarop het model ' +
@@ -583,7 +383,7 @@
       highTitle: 'Advies',
       highAsk: 'Vraag de patiënt: heeft u een tandarts, en wordt uw tandvlees ' +
         'gecontroleerd of behandeld voor een tandvleesaandoening?',
-      highYes: 'Ja: adviseer die zorg voort te zetten en deze uitslag te noemen.',
+      highYes: 'Ja: adviseer de patiënt die zorg voort te zetten.',
       highNo: 'Nee: adviseer een bezoek aan een tandarts of parodontoloog voor een tandvleesonderzoek.',
       lowTitle: 'Advies',
       lowAdvice: 'Nu geen specifiek advies: gewone tandheelkundige controles, en ' +
@@ -591,12 +391,11 @@
       footerText: 'Onderzoeksprototype van Elena Stamatelou',
       footerSource: 'broncode',
       whyTitle: 'Waarom deze uitslag?',
-      whyIntro: 'Vergeleken met de gemiddelde patiënt uit het onderzoek waarop het model ' +
-        'is gebouwd, verhoogden (▲) of verlaagden (▼) deze antwoorden de schatting:',
+      whyIntro: 'De antwoorden hieronder verhoogden (▲) of verlaagden (▼) de uitslag:',
       whyItem: (name, yes) => `${name}: ${yes ? 'ja' : 'nee'}`,
-      itemNames: { Q1_gum_disease: 'Zelf ervaren tandvleesaandoening', Q3_gum_treatment: 'Eerdere tandvleesbehandeling',
-        Q4_loose_teeth: 'Losstaande tanden', Q5_bone_loss: 'Botverlies rondom de tanden',
-        Q6_tooth_appearance: 'Tand die er niet goed uitziet' },
+      itemNames: { Q1_gum_disease: 'Zelfgerapporteerde tandvleesaandoening', Q3_gum_treatment: 'Zelfgerapporteerde tandvleesbehandeling',
+        Q4_loose_teeth: 'Ervaren losstaande tanden', Q5_bone_loss: 'Ervaren botverlies rondom de tanden',
+        Q6_tooth_appearance: 'Zorgen over het uiterlijk van een tand' },
       whyAge: (a) => `Leeftijd ${a}`,
       whySmokes: 'Rookt',
       whyNoSmoke: 'Rookt niet',
@@ -605,12 +404,7 @@
         none: 'nauwelijks effect', down1: '▼ verlaagt licht', down2: '▼ verlaagt',
         down3: '▼ verlaagt sterk' },
       whyHowSummary: 'Zo leest u dit',
-      whyHow: 'De balken zijn SHAP-waarden (SHapley Additive exPlanations). Voor dit model ' +
-        'laten ze precies zien hoeveel elk antwoord de schatting verschuift ten opzichte ' +
-        'van het gemiddelde antwoord van de 341 patiënten waarop het model is ontwikkeld: ' +
-        'naar rechts verhoogt het de schatting, naar links verlaagt het die. Ze verklaren ' +
-        'de berekening van het model, niet de oorzaak van de ziekte, en een patiënt zonder ' +
-        'klachten kan toch parodontitis hebben.',
+      whyHow: 'Elke balk laat zien hoeveel een antwoord de uitslag verschoof. De balken verklaren de uitslag, niet de oorzaak van ernstige parodontitis; een patiënt zonder klachten kan toch parodontitis hebben. Details: Stamatelou et al. (2027). Dit is een onderzoeksprototype, geen gecertificeerd medisch hulpmiddel of klinisch beslissingsinstrument.',
     },
   };
 
@@ -747,16 +541,35 @@
     return ageValid();
   }
 
+  // Mockup: progress in the bottom bar; the button stays active and, with gaps, jumps to the first one
+  const NAMES = ['age', 'sex', 'smoking', 'q1', 'q3', 'q4', 'q5', 'q6', 'q2'];
+  function answered(name) {
+    return name === 'age' ? ageValid() : !!form.querySelector(`input[name="${name}"]:checked`);
+  }
+  function updateProgress() {
+    const k = NAMES.filter(answered).length;
+    const t = I18N[currentLang];
+    document.getElementById('progress-text').textContent = k === NAMES.length ? t.complete : t.progress(k, NAMES.length);
+    document.getElementById('progress-bar').style.width = `${(100 * k) / NAMES.length}%`;
+    NAMES.forEach((n) => { if (answered(n)) form.querySelector(`[data-name="${n}"]`).classList.remove('missing'); });
+  }
   form.addEventListener('input', () => {
     // badInput: the browser holds text that is not a number (the value then reads as empty)
     const typed = ageInput.value !== '' || ageInput.validity.badInput;
     ageMsg.classList.toggle('hidden', !typed || ageValid());
-    submitBtn.disabled = !allAnswered();
+    updateProgress();
   });
+  document.querySelectorAll('.lang-btn').forEach((btn) => btn.addEventListener('click', updateProgress));
+  updateProgress();
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    if (!allAnswered()) return;            // never score an incomplete or invalid form
+    if (!allAnswered()) {                  // never score an incomplete form: show the gaps instead
+      const gaps = NAMES.filter((n) => !answered(n));
+      gaps.forEach((n) => form.querySelector(`[data-name="${n}"]`).classList.add('missing'));
+      form.querySelector(`[data-name="${gaps[0]}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
     const data = new FormData(form);
 
     const answers = {
@@ -778,6 +591,7 @@
     showWhy(answers);
 
     form.classList.add('hidden');
+    document.getElementById('dock').classList.add('hidden');
     subtitle.classList.add('hidden');      // the instruction is for the questions, not for the result
     resultScreen.classList.remove('hidden');
     resultScreen.scrollIntoView({ behavior: 'smooth' });
@@ -789,13 +603,16 @@
     lastAnswers = null;
     document.getElementById('why').classList.add('hidden');
     document.getElementById('prob-details').open = false;
-    submitBtn.disabled = true;
     resultScreen.classList.add('hidden');
+    document.getElementById('dock').classList.remove('hidden');
+    form.querySelectorAll('.missing').forEach((el) => el.classList.remove('missing'));
+    updateProgress();
     ageMsg.classList.add('hidden');
     subtitle.classList.remove('hidden');
     form.classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
+
 </script>
 </body>
 </html>
