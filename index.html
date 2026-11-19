@@ -193,20 +193,13 @@
       <h2 data-i18n="whyTitle"></h2>
       <p class="why-intro" data-i18n="whyIntro"></p>
       <div id="why-rows"></div>
-      <details>
-        <summary data-i18n="whyHowSummary"></summary>
-        <p data-i18n="whyHow"></p>
-      </details>
     </div>
-    <details id="prob-details">
-      <summary data-i18n="probSummary"></summary>
-      <p><b id="result-pct">—</b>: <span id="result-words"></span>. <span id="thr-note"></span></p>
-    </details>
     <p class="always-caveat" data-i18n="alwaysCaveat"></p>
-    <details>
+    <!-- One "About" dropdown instead of three (Elena, 19 Nov 2026) -->
+    <details id="about-details">
       <summary data-i18n="aboutSummary"></summary>
-      <p data-i18n="aboutP1"></p>
-      <p data-i18n="aboutLi5"></p>
+      <p data-i18n="aboutBars"></p>
+      <p data-i18n="aboutModel"></p>
     </details>
     <button type="button" id="restart-btn" class="btn secondary" data-i18n="restartBtn"></button>
   </section>
@@ -265,32 +258,11 @@
       resultLabel: 'Screening result for severe periodontitis',
       high: 'High risk',
       low: 'Low risk',
-      probSummary: 'Show the predicted probability',
-      thrNote: (t) => `High risk means a predicted probability of ${t}% or more.`,
       alwaysCaveat: 'This screening result is not a diagnosis. Periodontitis is diagnosed by a dental examination. If the patient has any of the symptoms above, advise a dentist visit regardless of this result.',
-      aboutSummary: 'About this tool',
-      aboutP1: 'This result comes from a machine-learning-based model, developed in a research project validating self-reported oral health questionnaires as a periodontitis screening aid. It was developed using 341 people from two Dutch medical outpatient cohorts (Amsterdam UMC, Department of Internal Medicine); severe periodontitis was defined as a score of 4 on the Community Periodontal Index of Treatment Needs (CPITN) in at least one sextant. The model and its validation are described in Stamatelou et al. (2027).',
-      aboutLi1: 'The six questions above are the original English wording of ' +
-        'the self-reported oral health items that Verhulst et al. (2019) ' +
-        'translated into Dutch. The model was fitted to answers given to that ' +
-        'Dutch version, so its measured accuracy applies to the Dutch wording; ' +
-        'the English items have not been separately validated in this setting.',
-      aboutLi2: 'The model was developed in internal medicine outpatients, not in ' +
-        'the general population. In a periodontology clinic, where severe ' +
-        'periodontitis is more common, it ranked patients equally well but its ' +
-        'predicted probabilities were too low.',
-      aboutLi3: 'Nothing you type into the form — your age, answers, or ' +
-        'result — is transmitted, logged, or stored anywhere. The ' +
-        'calculation runs entirely in your browser.',
-      aboutLi4: 'This page uses GoatCounter, a privacy-friendly analytics ' +
-        'service, to count anonymous page visits (no cookies, no personal ' +
-        'data, no form answers). This is only used to see how often the tool ' +
-        'is used, never what anyone answered.',
-      aboutLi5: 'This is a research prototype, not a certified medical device ' +
-        'or clinical decision tool.',
+      aboutSummary: 'About this result',
+      aboutBars: 'Each bar shows how much an answer raised or lowered the result. The bars explain the result, not the cause of periodontitis.',
+      aboutModel: 'The model was developed in 341 internal medicine outpatients; severe periodontitis was defined as CPITN 4 (Stamatelou et al., 2027). This is a research prototype, not a certified medical device.',
       restartBtn: 'Start over',
-      inTen: (k) => `about ${k} in 10 people with these answers have severe periodontitis`,
-      oneIn: (k) => `about 1 in ${k} people with these answers have severe periodontitis`,
       highTitle: 'Advice',
       highAsk: 'Ask the patient: do you have a dentist, and are your gums being ' +
         'checked or treated for gum disease?',
@@ -314,8 +286,6 @@
       effect: { up3: '▲ strongly raises', up2: '▲ raises', up1: '▲ slightly raises',
         none: 'hardly any effect', down1: '▼ slightly lowers', down2: '▼ lowers',
         down3: '▼ strongly lowers' },
-      whyHowSummary: 'How to read this',
-      whyHow: 'Each bar shows how much an answer moved the result. The bars explain the result, not the cause of severe periodontitis; a patient without complaints can still have periodontitis. Details: Stamatelou et al. (2027). This is a research prototype, not a certified medical device or clinical decision tool.',
     },
     nl: {
       labAge: 'Leeftijd', labSex: 'Geslacht', labSmoking: 'Roken',
@@ -353,33 +323,11 @@
       resultLabel: 'Screeningsuitslag voor ernstige parodontitis',
       high: 'Hoog risico',
       low: 'Laag risico',
-      probSummary: 'Toon de voorspelde kans',
-      thrNote: (t) => `Hoog risico betekent een voorspelde kans van ${t}% of meer.`,
       alwaysCaveat: 'Deze screeningsuitslag is geen diagnose. Parodontitis wordt vastgesteld door een tandheelkundig onderzoek. Heeft de patiënt een van de klachten hierboven, adviseer dan sowieso een bezoek aan de tandarts, ongeacht deze uitslag.',
-      aboutSummary: 'Over deze tool',
-      aboutP1: 'Deze uitslag komt van een op machine learning gebaseerd model, ontwikkeld in een onderzoeksproject dat vragenlijsten over zelfgerapporteerde mondgezondheid valideert als hulpmiddel bij het screenen op parodontitis. Het model is ontwikkeld met 341 personen uit twee Nederlandse cohorten van medische poliklinieken (Amsterdam UMC, afdeling Interne Geneeskunde); ernstige parodontitis werd gedefinieerd als een score van 4 op de Community Periodontal Index of Treatment Needs (CPITN) in ten minste één sextant. Het model en de validatie ervan worden beschreven in Stamatelou et al. (2027).',
-      aboutLi1: 'De zes vragen hierboven zijn de gepubliceerde Nederlandse ' +
-        'vertaling uit het oorspronkelijke onderzoek (Verhulst et al., 2019, ' +
-        'aanvullend materiaal) — dichter bij de vraagtekst waarop het model ' +
-        'is gevalideerd dan de Engelse bewerking op deze pagina, maar dit ' +
-        'webformulier zelf is niet opnieuw en apart gevalideerd.',
-      aboutLi2: 'Het model is ontwikkeld bij poliklinische patiënten van de Interne ' +
-        'Geneeskunde, niet in de algemene bevolking. In een parodontologiekliniek, ' +
-        'waar ernstige parodontitis vaker voorkomt, rangschikte het patiënten even ' +
-        'goed, maar waren de voorspelde kansen te laag.',
-      aboutLi3: 'Niets van wat u in het formulier invult — uw leeftijd, ' +
-        'antwoorden of uitslag — wordt verzonden, gelogd of ergens ' +
-        'opgeslagen. De berekening gebeurt volledig in uw browser.',
-      aboutLi4: 'Deze pagina gebruikt GoatCounter, een privacyvriendelijke ' +
-        'analysedienst, om anonieme paginabezoeken te tellen (geen cookies, ' +
-        'geen persoonsgegevens, geen antwoorden uit het formulier). Dit wordt ' +
-        'alleen gebruikt om te zien hoe vaak de tool wordt gebruikt, nooit wat ' +
-        'iemand heeft geantwoord.',
-      aboutLi5: 'Dit is een onderzoeksprototype, geen gecertificeerd medisch ' +
-        'hulpmiddel of klinisch beslissingsinstrument.',
+      aboutSummary: 'Over deze uitslag',
+      aboutBars: 'Elke balk laat zien hoeveel een antwoord de uitslag verhoogde of verlaagde. De balken verklaren de uitslag, niet de oorzaak van parodontitis.',
+      aboutModel: 'Het model is ontwikkeld bij 341 poliklinische patiënten van de Interne Geneeskunde; ernstige parodontitis werd gedefinieerd als CPITN 4 (Stamatelou et al., 2027). Dit is een onderzoeksprototype, geen gecertificeerd medisch hulpmiddel.',
       restartBtn: 'Opnieuw beginnen',
-      inTen: (k) => `ongeveer ${k} op de 10 mensen met deze antwoorden hebben ernstige parodontitis`,
-      oneIn: (k) => `ongeveer 1 op de ${k} mensen met deze antwoorden heeft ernstige parodontitis`,
       highTitle: 'Advies',
       highAsk: 'Vraag de patiënt: heeft u een tandarts, en wordt uw tandvlees ' +
         'gecontroleerd of behandeld voor een tandvleesaandoening?',
@@ -403,8 +351,6 @@
       effect: { up3: '▲ verhoogt sterk', up2: '▲ verhoogt', up1: '▲ verhoogt licht',
         none: 'nauwelijks effect', down1: '▼ verlaagt licht', down2: '▼ verlaagt',
         down3: '▼ verlaagt sterk' },
-      whyHowSummary: 'Zo leest u dit',
-      whyHow: 'Elke balk laat zien hoeveel een antwoord de uitslag verschoof. De balken verklaren de uitslag, niet de oorzaak van ernstige parodontitis; een patiënt zonder klachten kan toch parodontitis hebben. Details: Stamatelou et al. (2027). Dit is een onderzoeksprototype, geen gecertificeerd medisch hulpmiddel of klinisch beslissingsinstrument.',
     },
   };
 
@@ -489,10 +435,6 @@
     const isHigh = risk >= MODEL.operatingThreshold;
     resultNumber.textContent = isHigh ? t.high : t.low;
     resultNumber.className = 'result-number ' + (isHigh ? 'is-high' : 'is-low');
-    document.getElementById('result-pct').textContent = `${Math.round(risk * 100)}%`;
-    document.getElementById('thr-note').textContent = t.thrNote(Math.round(MODEL.operatingThreshold * 100));
-    document.getElementById('result-words').textContent =
-      risk >= 0.5 ? t.inTen(Math.round(risk * 10)) : t.oneIn(Math.max(1, Math.round(1 / risk)));
     const box = document.getElementById('advice');
     box.replaceChildren();
     const lines = risk >= MODEL.operatingThreshold
@@ -602,7 +544,7 @@
     lastRisk = null;
     lastAnswers = null;
     document.getElementById('why').classList.add('hidden');
-    document.getElementById('prob-details').open = false;
+    document.getElementById('about-details').open = false;
     resultScreen.classList.add('hidden');
     document.getElementById('dock').classList.remove('hidden');
     form.querySelectorAll('.missing').forEach((el) => el.classList.remove('missing'));
